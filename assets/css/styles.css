@@ -1033,3 +1033,9 @@ html.js .preview__native {
     transform: none;
   }
 }
+
+/* Header mark: show only the vinyl disc, not the square plate behind it. */
+.logo img {
+  clip-path: circle(36.328% at 50% 50%);
+  transform: scale(1.3);
+}
