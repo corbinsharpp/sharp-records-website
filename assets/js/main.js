@@ -176,3 +176,96 @@ if (form) {
     }
   });
 }
+
+
+/* 15-second release preview players */
+(() => {
+  const players = Array.from(document.querySelectorAll("[data-preview]"));
+  if (!players.length) return;
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const MAX = 15;
+
+  const fmt = (s) => {
+    const t = Math.max(0, Math.min(MAX, s));
+    const m = Math.floor(t / 60);
+    const sec = Math.floor(t % 60);
+    return `${m}:${String(sec).padStart(2, "0")}`;
+  };
+
+  const setPlaying = (root, playing) => {
+    const btn = root.querySelector("[data-preview-btn]");
+    const label = root.querySelector("[data-preview-label]");
+    if (!btn) return;
+    btn.setAttribute("aria-pressed", playing ? "true" : "false");
+    if (label) label.textContent = playing ? "Pause preview — 0:15" : "Play preview — 0:15";
+  };
+
+  const pauseOthers = (except) => {
+    players.forEach((root) => {
+      if (root === except) return;
+      const audio = root.querySelector("[data-preview-audio]");
+      if (audio && !audio.paused) audio.pause();
+      setPlaying(root, false);
+    });
+  };
+
+  players.forEach((root) => {
+    const audio = root.querySelector("[data-preview-audio]");
+    const btn = root.querySelector("[data-preview-btn]");
+    const bar = root.querySelector("[data-preview-bar]");
+    const timeEl = root.querySelector("[data-preview-time]");
+    const progress = root.querySelector("[data-preview-progress]");
+    if (!audio || !btn) return;
+
+    // Progressive enhancement: custom button replaces native controls UI
+    btn.hidden = false;
+    if (timeEl) timeEl.hidden = false;
+    if (progress) progress.hidden = false;
+    audio.removeAttribute("controls");
+
+    const sync = () => {
+      const t = Math.min(audio.currentTime || 0, MAX);
+      if (timeEl) timeEl.textContent = fmt(t);
+      if (bar) {
+        const pct = (t / MAX) * 100;
+        if (reduceMotion) bar.style.width = `${pct}%`;
+        else bar.style.width = `${pct}%`;
+      }
+      if (t >= MAX - 0.05) {
+        audio.pause();
+        audio.currentTime = 0;
+        setPlaying(root, false);
+        if (timeEl) timeEl.textContent = "0:00";
+        if (bar) bar.style.width = "0%";
+      }
+    };
+
+    btn.addEventListener("click", () => {
+      if (audio.paused) {
+        pauseOthers(root);
+        if (audio.currentTime >= MAX) audio.currentTime = 0;
+        setPlaying(root, true);
+        const playPromise = audio.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => setPlaying(root, false));
+        }
+      } else {
+        audio.pause();
+        setPlaying(root, false);
+      }
+    });
+
+    audio.addEventListener("timeupdate", sync);
+    audio.addEventListener("ended", () => {
+      audio.currentTime = 0;
+      setPlaying(root, false);
+      if (timeEl) timeEl.textContent = "0:00";
+      if (bar) bar.style.width = "0%";
+    });
+    audio.addEventListener("pause", () => {
+      if (audio.currentTime < MAX - 0.05) setPlaying(root, false);
+    });
+    audio.addEventListener("play", () => setPlaying(root, true));
+  });
+})();

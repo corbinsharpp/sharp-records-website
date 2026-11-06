@@ -245,3 +245,55 @@ test.describe("enquire form", () => {
     expect(unexpected).toEqual([]);
   });
 });
+
+
+test.describe("SR001 Flippin preview", () => {
+  test("homepage preview button exists and toggles aria-pressed", async ({ page, request, baseURL }) => {
+    const errors = attachConsole(page);
+    await page.goto("/index.html", { waitUntil: "networkidle" });
+
+    const home = page.locator("#home-sr001");
+    await expect(home).toBeVisible();
+    const btn = home.locator("[data-preview-btn]");
+    await expect(btn).toBeVisible();
+    await expect(btn).toHaveAttribute("aria-pressed", "false");
+    await expect(btn).toContainText(/Play preview/i);
+
+    const audio = home.locator("audio[data-preview-audio]");
+    await expect(audio).toHaveCount(1);
+    const sources = await audio.locator("source").evaluateAll((els) =>
+      els.map((el) => el.getAttribute("src"))
+    );
+    expect(sources.length).toBeGreaterThan(0);
+
+    for (const src of sources) {
+      const url = new URL(src, baseURL).href;
+      const res = await request.get(url);
+      expect(res.status(), `${src} should be 200`).toBe(200);
+    }
+
+    await btn.click();
+    await expect(btn).toHaveAttribute("aria-pressed", "true", { timeout: 5000 });
+    await btn.click();
+    await expect(btn).toHaveAttribute("aria-pressed", "false");
+    expect(errors).toEqual([]);
+  });
+
+  test("releases page SR001 preview button and audio sources", async ({ page, request, baseURL }) => {
+    await page.goto("/releases.html#sr001", { waitUntil: "networkidle" });
+    const release = page.locator("#sr001");
+    await expect(release).toBeVisible();
+    const btn = release.locator("[data-preview-btn]");
+    await expect(btn).toBeVisible();
+    await expect(btn).toHaveAttribute("aria-pressed", "false");
+
+    const src = await release.locator("audio[data-preview-audio] source").first().getAttribute("src");
+    const res = await request.get(new URL(src, baseURL).href);
+    expect(res.status()).toBe(200);
+
+    await btn.click();
+    await expect(btn).toHaveAttribute("aria-pressed", "true", { timeout: 5000 });
+    await btn.click();
+    await expect(btn).toHaveAttribute("aria-pressed", "false");
+  });
+});
