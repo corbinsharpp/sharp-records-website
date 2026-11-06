@@ -138,7 +138,6 @@ def footer(current: str) -> str:
       <div>
         <a class="brand" href="index.html">Sharp Records</a>
         <p>An independent electronic music label from Manchester. A platform for music, art and culture.</p>
-        <p>No fixed genres. No creative limits. No compromises.</p>
       </div>
       <div>
         <p class="eyebrow">Explore</p>
@@ -157,7 +156,7 @@ def footer(current: str) -> str:
     </div>
     <p class="wrap footer-mark" aria-hidden="true">SHARP</p>
   </footer>
-  <script type="module" src="assets/js/main.js?v=20261106j"></script>"""
+  <script type="module" src="assets/js/main.js?v=20261106k"></script>"""
 
 
 def head(title: str, description: str, canonical: str, jsonld: str) -> str:
@@ -187,7 +186,7 @@ def head(title: str, description: str, canonical: str, jsonld: str) -> str:
   <link rel="manifest" href="site.webmanifest">
   <link rel="preload" href="assets/fonts/oswald.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261106j">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261106k">
   <script type="application/ld+json">
 {jsonld}
   </script>
