@@ -1141,3 +1141,40 @@ html.js .preview__native {
   block-size: 3px;
   background: var(--color-accent);
 }
+
+/* Tiny spinning record beside each Releases play button: appears on first play,
+   spins while playing, stops (and stays) when paused. */
+.preview__disc {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  inline-size: 0;
+  block-size: 1.15rem;
+  margin-inline-start: -0.55rem;
+  opacity: 0;
+  overflow: hidden;
+  color: var(--color-fg);
+  transition: inline-size 0.2s ease, margin 0.2s ease, opacity 0.2s ease;
+}
+
+.preview__disc svg {
+  inline-size: 1.15rem;
+  block-size: 1.15rem;
+  flex: none;
+  animation: preview-disc-spin 1.8s linear infinite;
+  animation-play-state: paused;
+}
+
+.preview.has-played .preview__disc {
+  inline-size: 1.15rem;
+  margin-inline-start: 0;
+  opacity: 1;
+}
+
+.preview.is-playing .preview__disc svg { animation-play-state: running; }
+
+@keyframes preview-disc-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .preview__disc svg { animation: none; }
+}

@@ -228,6 +228,7 @@ if (form) {
     const title = trackTitle(root);
     btn.setAttribute("aria-label", playing ? `Pause preview of ${title}` : `Play preview of ${title}`);
     root.classList.toggle("is-playing", playing);
+    if (playing) root.classList.add("has-played");
     if (!playing) root.style.removeProperty("--live-amp");
   };
 
