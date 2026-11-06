@@ -295,19 +295,13 @@ h3 { font-size: var(--step-1); margin: 0 0 var(--space-xs); }
 }
 
 .vinyl {
-  position: absolute;
-  inset: 8%;
-  border-radius: 50%;
-  background:
-    repeating-radial-gradient(circle at 50% 50%,
-      #141414 0 1px,
-      #0a0a0a 1px 6px);
-  box-shadow: 0 0 0 1px #2a2a2a;
+  /* Unused: hero now uses the full vinyl SVG (logo-vinyl.svg) which includes the disc + spiral text. */
+  display: none;
 }
 
 .hero__visual img {
   position: relative;
-  width: min(58%, 18rem);
+  width: min(100%, 28rem);
   height: auto;
   z-index: 1;
 }
