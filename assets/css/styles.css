@@ -1039,3 +1039,53 @@ html.js .preview__native {
   clip-path: circle(36.328% at 50% 50%);
   transform: scale(1.3);
 }
+
+/* Consent checkbox: square box beside a normal-case sentence, not a full-width input with a tiny caps label. */
+.field .consent {
+  display: grid;
+  grid-template-columns: 1.25rem 1fr;
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.field .consent input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  padding: 0;
+  margin: 0.15rem 0 0;
+  border: 1px solid var(--color-fg);
+  background: var(--color-bg);
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+}
+
+.field .consent input[type="checkbox"]::after {
+  content: "";
+  inline-size: 0.65rem;
+  block-size: 0.65rem;
+  background: var(--color-fg);
+  transform: scale(0);
+  transition: transform 0.12s ease;
+}
+
+.field .consent input[type="checkbox"]:checked::after { transform: scale(1); }
+
+.field .consent input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--color-fg);
+  outline-offset: 3px;
+}
+
+.field.is-invalid .consent input[type="checkbox"] { border-color: #e07070; }
+
+.field .consent label {
+  font-family: inherit;
+  font-size: var(--step--1, 0.9rem);
+  letter-spacing: normal;
+  text-transform: none;
+  line-height: 1.5;
+  color: var(--color-muted);
+  cursor: pointer;
+}
