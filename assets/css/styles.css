@@ -1181,3 +1181,36 @@ html.js .preview__native {
 @media (prefers-reduced-motion: reduce) {
   .preview__disc img { animation: none; }
 }
+
+/* Record v3: always shown on all three tracks, larger, with white groove lines. */
+.preview__disc {
+  position: relative;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  margin-inline-start: 0;
+  opacity: 1;
+  overflow: visible;
+  border-radius: 50%;
+}
+
+.preview__disc img {
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+}
+
+.preview__disc::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-fg);
+  background: repeating-radial-gradient(
+    circle at 50% 50%,
+    transparent 0 0.2rem,
+    rgba(242, 240, 234, 0.55) 0.2rem calc(0.2rem + 1px),
+    transparent calc(0.2rem + 1px) 0.27rem
+  );
+  -webkit-mask: radial-gradient(circle, transparent 0 0.42rem, #000 0.43rem);
+          mask: radial-gradient(circle, transparent 0 0.42rem, #000 0.43rem);
+  pointer-events: none;
+}
