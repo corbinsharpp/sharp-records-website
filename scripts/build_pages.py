@@ -157,7 +157,7 @@ def footer(current: str) -> str:
     </div>
     <p class="wrap footer-mark" aria-hidden="true">SHARP</p>
   </footer>
-  <script type="module" src="assets/js/main.js?v=20261106b></script>"""
+  <script type="module" src="assets/js/main.js?v=20261106b"></script>"""
 
 
 def head(title: str, description: str, canonical: str, jsonld: str) -> str:
@@ -187,7 +187,7 @@ def head(title: str, description: str, canonical: str, jsonld: str) -> str:
   <link rel="manifest" href="site.webmanifest">
   <link rel="preload" href="assets/fonts/oswald.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261106b>
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261106b">
   <script type="application/ld+json">
 {jsonld}
   </script>
