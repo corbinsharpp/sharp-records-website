@@ -1111,3 +1111,33 @@ html.js .preview__native {
   text-transform: uppercase;
   pointer-events: none;
 }
+
+/* SR001 tag v2: Factory-style catalogue stamp, flush in the bottom-right corner.
+   Refs: Factory Records FAC numbering (Peter Saville), Warp and ECM catalogue
+   typography, and Hyperdub's corner marks. Flush to the edge, no rounded shapes. */
+.release__tag {
+  inset-block-start: auto;
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.55rem 0.7rem 0.5rem;
+  background: var(--color-fg);
+  color: var(--color-bg);
+  border: 0;
+  box-shadow: none;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.release__tag::before {
+  content: "";
+  justify-self: end;
+  inline-size: 1.6rem;
+  block-size: 3px;
+  background: var(--color-accent);
+}
