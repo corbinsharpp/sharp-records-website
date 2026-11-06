@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Artists | Sharp Records</title>
   <meta name="description" content="Artists on Sharp Records. First signing: Bloom’s Village (Will Holton), Manchester.">
-  <meta name="theme-color" content="#050505">
+  <meta name="theme-color" content="#0D0D0D">
   <link rel="canonical" href="https://www.sharprecords.co.uk/artists.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Sharp Records">
@@ -25,64 +25,48 @@
   <link rel="preload" href="assets/fonts/oswald.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/styles.css">
-    <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": ["MusicGroup", "Organization"],
-        "@id": "https://www.sharprecords.co.uk/#label",
-        "name": "Sharp Records",
-        "url": "https://www.sharprecords.co.uk/",
-        "logo": "https://www.sharprecords.co.uk/assets/img/mark.svg",
-        "image": "https://www.sharprecords.co.uk/assets/img/og-image.png",
-        "description": "Manchester electronic record label specialising in jungle, garage, breaks, ghetto tech and dubstep.",
-        "foundingLocation": {
-          "@type": "Place",
-          "name": "Manchester",
-          "address": { "@type": "PostalAddress", "addressLocality": "Manchester", "addressCountry": "GB" }
-        },
-        "genre": ["Jungle", "UK Garage", "Breaks", "Ghetto Tech", "Dubstep", "Experimental Electronic"],
-        "email": "corbinsharpp@gmail.com",
-        "contactPoint": {
-          "@type": "ContactPoint",
-          "contactType": "customer support",
-          "url": "https://www.sharprecords.co.uk/enquire.html",
-          "email": "corbinsharpp@gmail.com"
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": [
+        "MusicGroup",
+        "Organization"
+      ],
+      "@id": "https://www.sharprecords.co.uk/#label",
+      "name": "Sharp Records",
+      "url": "https://www.sharprecords.co.uk/",
+      "logo": "https://www.sharprecords.co.uk/assets/img/logo-vinyl.svg",
+      "image": "https://www.sharprecords.co.uk/assets/img/og-image.png",
+      "description": "Independent electronic music label from Manchester. A platform for music, art and culture. No fixed genre. No creative limits. No compromise.",
+      "foundingLocation": {
+        "@type": "Place",
+        "name": "Manchester",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Manchester",
+          "addressCountry": "GB"
         }
       },
-      {
-        "@type": "MusicEvent",
-        "name": "Sharp Records launch night",
-        "startDate": "2027-03-20T22:00:00+00:00",
-        "eventStatus": "https://schema.org/EventScheduled",
-        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
-        "location": {
-          "@type": "Place",
-          "name": "Venue TBA",
-          "address": { "@type": "PostalAddress", "addressLocality": "Manchester", "addressCountry": "GB" }
-        },
-        "performer": { "@type": "MusicGroup", "name": "Bloom's Village" },
-        "organizer": { "@id": "https://www.sharprecords.co.uk/#label" },
-        "description": "Placeholder date for the label's first Manchester night. Venue to be announced."
-      },
-      {
-        "@type": "MusicEvent",
-        "name": "Bloom's Village live",
-        "startDate": "2027-05-08T21:00:00+01:00",
-        "eventStatus": "https://schema.org/EventScheduled",
-        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
-        "location": {
-          "@type": "Place",
-          "name": "Venue TBA",
-          "address": { "@type": "PostalAddress", "addressLocality": "Manchester", "addressCountry": "GB" }
-        },
-        "performer": { "@type": "MusicGroup", "name": "Bloom's Village" },
-        "organizer": { "@id": "https://www.sharprecords.co.uk/#label" },
-        "description": "Placeholder listing for a first live date supporting the debut EP."
+      "genre": [
+        "Jungle",
+        "UK Garage",
+        "Techno",
+        "House",
+        "Breaks",
+        "Experimental"
+      ],
+      "email": "corbinsharpp@gmail.com",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "url": "https://www.sharprecords.co.uk/enquire.html",
+        "email": "corbinsharpp@gmail.com"
       }
-    ]
-  }
+    }
+  ]
+}
   </script>
 </head>
   <body>
@@ -90,7 +74,7 @@
   <header class="site-header">
     <div class="site-header__inner">
       <a class="logo" href="index.html">
-        <img src="assets/img/logo-vinyl.svg" width="48" height="48" alt="">
+        <img src="assets/img/logo-vinyl.svg" width="44" height="44" alt="">
         <span>Sharp Records</span>
       </a>
       <button class="nav-toggle" type="button" data-nav-toggle aria-controls="site-nav" aria-expanded="false" aria-label="Open menu" hidden>
@@ -98,11 +82,12 @@
       </button>
       <nav class="site-nav" id="site-nav" data-nav aria-label="Primary">
         <ul class="site-nav__list">
-          <li><a href="index.html">Home</a></li>
           <li><a href="releases.html">Releases</a></li>
           <li><a href="artists.html" aria-current="page">Artists</a></li>
           <li><a href="events.html">Events</a></li>
-          <li><a href="news.html">News</a></li>
+          <li><a href="radio.html">Radio</a></li>
+          <li><a href="culture.html">Culture</a></li>
+          <li><a href="about.html">About</a></li>
           <li><a href="enquire.html">Enquire</a></li>
         </ul>
       </nav>
@@ -118,18 +103,19 @@
     </header>
     <section class="section">
       <div class="wrap">
-        <article class="feature" id="blooms-village">
-          <div class="feature__panel">
+        <article class="artist" id="blooms-village">
+          <div class="artist__visual">
+            <img src="assets/img/art-artist.webp" width="900" height="1260" alt="Grainy monochrome study of stacked architectural slabs and a vertical slit of light. Abstract, not a portrait.">
+          </div>
+          <div>
             <p class="meta">Manchester · Experimental electronic</p>
             <h2>Bloom’s Village</h2>
             <p>The recording name of Will Holton, a Manchester-based artist working across experimental electronic music. His debut for the label is a three-track EP, catalogue SR001.</p>
-            <p><a class="button" href="releases.html#sr001">Listen now</a></p>
-          </div>
-          <div>
             <p class="eyebrow">Selected work</p>
             <ul class="tracklist">
               <li><span>Untitled EP</span><span>SR001</span></li>
             </ul>
+            <p><a class="button" href="releases.html#sr001">Listen now</a></p>
           </div>
         </article>
       </div>
@@ -139,27 +125,31 @@
     <div class="wrap site-footer__grid">
       <div>
         <a class="brand" href="index.html">Sharp Records</a>
-        <p>Electronic music from Manchester. Jungle, garage, breaks, ghetto tech and dubstep.</p>
+        <p>An independent electronic music label from Manchester. A platform for music, art and culture.</p>
+        <p>No fixed genre. No creative limits. No compromise.</p>
       </div>
       <div>
         <p class="eyebrow">Explore</p>
         <nav aria-label="Footer">
           <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="releases.html">Releases</a></li>
-            <li><a href="artists.html" aria-current="page">Artists</a></li>
-            <li><a href="events.html">Events</a></li>
-            <li><a href="news.html">News</a></li>
-            <li><a href="enquire.html">Enquire</a></li>
+          <li><a href="releases.html">Releases</a></li>
+          <li><a href="artists.html" aria-current="page">Artists</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="radio.html">Radio</a></li>
+          <li><a href="culture.html">Culture</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="enquire.html">Enquire</a></li>
           </ul>
         </nav>
       </div>
       <div>
         <p class="eyebrow">Contact</p>
         <p><a href="enquire.html">Enquire</a></p>
+        <p><a href="mailto:corbinsharpp@gmail.com">corbinsharpp@gmail.com</a></p>
         <p>Manchester, United Kingdom</p>
       </div>
     </div>
+    <p class="wrap footer-mark" aria-hidden="true">SHARP</p>
   </footer>
   <script type="module" src="assets/js/main.js"></script>
 </body>

@@ -3,6 +3,8 @@
  * The site is fully usable without this file.
  */
 
+document.documentElement.classList.add("js");
+
 const nav = document.querySelector("[data-nav]");
 const toggle = document.querySelector("[data-nav-toggle]");
 
@@ -30,6 +32,26 @@ if (nav && toggle) {
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") setOpen(false);
+  });
+}
+
+const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+if (!motionQuery.matches && "IntersectionObserver" in window) {
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          io.unobserve(entry.target);
+        }
+      }
+    },
+    { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+  );
+  document.querySelectorAll("[data-reveal]").forEach((el) => io.observe(el));
+} else {
+  document.querySelectorAll("[data-reveal]").forEach((el) => {
+    el.classList.add("is-visible");
   });
 }
 

@@ -7,11 +7,13 @@ const pages = [
   "releases.html",
   "artists.html",
   "events.html",
-  "news.html",
+  "radio.html",
+  "culture.html",
+  "about.html",
   "enquire.html",
 ];
 
-const navLabels = ["Home", "Releases", "Artists", "Events", "News", "Enquire"];
+const navLabels = ["Releases", "Artists", "Events", "Radio", "Culture", "About", "Enquire"];
 
 function attachConsole(page) {
   const errors = [];
@@ -50,6 +52,7 @@ test.describe("primary and footer navigation", () => {
       await expect(nav.getByRole("link", { name: /^Inquire$/ })).toHaveCount(0);
       await expect(nav.getByRole("link", { name: /^Enquiry$/ })).toHaveCount(0);
       await expect(nav.getByRole("link", { name: /^Enquirer$/ })).toHaveCount(0);
+      await expect(nav.getByRole("link", { name: /^News$/ })).toHaveCount(0);
 
       const footerNav = page.getByRole("navigation", { name: "Footer" });
       for (const label of navLabels) {
@@ -60,8 +63,8 @@ test.describe("primary and footer navigation", () => {
       await expect(footer.getByRole("link", { name: "Enquire", exact: true }).first()).toBeVisible();
 
       const hrefs = await page.$$eval("a[href]", (as) => as.map((a) => a.getAttribute("href") || ""));
-      expect(hrefs.some((h) => /about\.html/i.test(h)), `${p} must not link to about.html`).toBeFalsy();
       expect(hrefs.some((h) => /inquire\.html/i.test(h)), `${p} must not link to inquire.html`).toBeFalsy();
+      expect(hrefs.some((h) => /about\.html/i.test(h)), `${p} should link to about.html`).toBeTruthy();
 
       expect(errors, `${p} console/page errors`).toEqual([]);
     });
@@ -119,7 +122,7 @@ test("Listen now goes to the SR001 release", async ({ page }) => {
 });
 
 test("footer Enquire link reaches the form", async ({ page }) => {
-  await page.goto("/news.html");
+  await page.goto("/culture.html");
   await page.getByRole("contentinfo").getByRole("link", { name: "Enquire", exact: true }).first().click();
   await expect(page).toHaveURL(/enquire\.html$/);
   await expect(page.locator("#enquire-form")).toBeVisible();
@@ -151,11 +154,19 @@ test("no 404s for same-origin links and assets", async ({ page, request, baseURL
   expect(broken, broken.join("\n")).toEqual([]);
 });
 
-test("site files do not include about.html or inquire.html", async () => {
+test("site files include the new pages and British Enquire spelling", async () => {
   const root = path.join(__dirname, "..");
-  expect(fs.existsSync(path.join(root, "about.html"))).toBeFalsy();
-  expect(fs.existsSync(path.join(root, "inquire.html"))).toBeFalsy();
+  expect(fs.existsSync(path.join(root, "about.html"))).toBeTruthy();
+  expect(fs.existsSync(path.join(root, "radio.html"))).toBeTruthy();
+  expect(fs.existsSync(path.join(root, "culture.html"))).toBeTruthy();
   expect(fs.existsSync(path.join(root, "enquire.html"))).toBeTruthy();
+  expect(fs.existsSync(path.join(root, "inquire.html"))).toBeFalsy();
+});
+
+test("news.html redirects to culture", async ({ page }) => {
+  await page.goto("/news.html", { waitUntil: "networkidle" });
+  await expect(page).toHaveURL(/culture\.html/);
+  await expect(page.getByRole("heading", { level: 1, name: "Culture" })).toBeVisible();
 });
 
 test.describe("enquire form", () => {

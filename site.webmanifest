@@ -1,11 +1,11 @@
 {
   "name": "Sharp Records",
   "short_name": "Sharp",
-  "description": "Manchester electronic record label.",
+  "description": "Independent electronic music label from Manchester. No fixed genre. No creative limits. No compromise.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#050505",
-  "theme_color": "#050505",
+  "background_color": "#0D0D0D",
+  "theme_color": "#0D0D0D",
   "lang": "en-GB",
   "icons": [
     { "src": "assets/img/favicon.svg", "sizes": "any", "type": "image/svg+xml" },

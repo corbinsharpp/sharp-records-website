@@ -2,6 +2,10 @@
 
 Static HTML, CSS and a small progressive-enhancement script. No build step.
 
+Pages: Home, Releases, Artists, Events, Radio, Culture, About and Enquire. The old `news.html` address redirects to Culture.
+
+Pages: home, Releases, Artists, Events, Radio, Culture, About and Enquire. `news.html` redirects to Culture.
+
 ## Local preview
 
 From this folder:

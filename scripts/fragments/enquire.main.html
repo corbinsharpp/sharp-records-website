@@ -1,0 +1,83 @@
+    <header class="page-hero">
+      <div class="wrap">
+        <p class="eyebrow">Contact</p>
+        <h1>Enquire</h1>
+        <p class="lede">Bookings, demos, press, licensing and everything else. Send a message and we will come back to you.</p>
+      </div>
+    </header>
+    <section class="section">
+      <div class="wrap">
+        <!--
+          === CONTACT CONFIG (edit this block only) ===
+          Formspree form ID: replace FORM_ID in the form action URL below.
+          Mailto fallback:   already set to corbinsharpp@gmail.com in data-mailto
+                             (the visible fallback link is filled from that attribute when JS runs,
+                              and mirrored in the mailto href for no-JS).
+        -->
+        <div id="form-success" class="form-status form-status--success" tabindex="-1" hidden>
+          <p>Thank you. Your enquiry has been sent and we will reply as soon as we can.</p>
+        </div>
+        <div id="form-error" class="form-status form-status--error" role="alert" hidden>
+          <p>Sorry — the message could not be sent just now. Please try again, or use the email link below.</p>
+        </div>
+
+        <form class="form" id="enquire-form" action="https://formspree.io/f/FORM_ID" method="post" data-mailto="corbinsharpp@gmail.com" novalidate>
+          <div class="form__fields">
+            <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <input type="hidden" name="_subject" value="New Sharp Records enquiry">
+            <input type="hidden" name="_replyto" value="">
+
+            <div class="field">
+              <label for="enquiry-type">Enquiry type</label>
+              <select id="enquiry-type" name="enquiry-type" required aria-describedby="enquiry-type-error">
+                <option value="">Select a type</option>
+                <option value="Bookings">Bookings</option>
+                <option value="Demo submission">Demo submission</option>
+                <option value="Press">Press</option>
+                <option value="Licensing/Sync">Licensing/Sync</option>
+                <option value="Other">Other</option>
+              </select>
+              <p class="field-error" id="enquiry-type-error">Please choose an enquiry type.</p>
+            </div>
+
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" autocomplete="name" required minlength="2" aria-describedby="name-error">
+              <p class="field-error" id="name-error">Please enter your name.</p>
+            </div>
+
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" autocomplete="email" required aria-describedby="email-error">
+              <p class="field-error" id="email-error">Please enter a valid email address.</p>
+            </div>
+
+            <div class="field">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" required minlength="10" aria-describedby="message-error"></textarea>
+              <p class="field-error" id="message-error">Please write a message of at least a few words.</p>
+            </div>
+
+            <div class="field">
+              <label for="demo-link">Demo link <span class="hint">(optional)</span></label>
+              <input id="demo-link" name="demo-link" type="url" inputmode="url" placeholder="https://" aria-describedby="demo-link-hint demo-link-error">
+              <p class="hint" id="demo-link-hint">A private SoundCloud, Dropbox or similar link if you are sending music.</p>
+              <p class="field-error" id="demo-link-error">Please enter a full URL starting with http:// or https://.</p>
+            </div>
+
+            <div class="field">
+              <div class="consent">
+                <input id="consent" name="consent" type="checkbox" value="yes" required aria-describedby="consent-error">
+                <label for="consent">I agree that Sharp Records may use these details to reply to this enquiry. We will not add you to a mailing list unless you ask.</label>
+              </div>
+              <p class="field-error" id="consent-error">Please confirm you are happy for us to use your details to reply.</p>
+            </div>
+
+            <p>
+              <button class="button" type="submit">Send message</button>
+            </p>
+            <p class="meta">Prefer email? <a id="mailto-fallback" href="mailto:corbinsharpp@gmail.com">corbinsharpp@gmail.com</a></p>
+          </div>
+        </form>
+      </div>
+    </section>
