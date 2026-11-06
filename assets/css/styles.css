@@ -768,7 +768,7 @@ a.media:hover img,
 
 .field { display: grid; gap: 0.4rem; }
 
-.field label {
+.field > label {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.12em;
@@ -784,7 +784,7 @@ a.media:hover img,
 .field-error { color: #e07070; display: none; }
 .field.is-invalid .field-error { display: block; }
 
-.field input,
+.field input:not([type="checkbox"]),
 .field select,
 .field textarea {
   width: 100%;
