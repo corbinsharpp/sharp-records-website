@@ -1089,3 +1089,25 @@ html.js .preview__native {
   color: var(--color-muted);
   cursor: pointer;
 }
+
+/* Release cover tag: small brutalist catalogue stamp on the right edge of the artwork. */
+.release__tag {
+  position: absolute;
+  inset-block-start: 1rem;
+  inset-inline-end: 0;
+  margin: 0;
+  padding: 0.4rem 0.6rem 0.35rem;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  border: 2px solid var(--color-fg);
+  border-inline-end: 0;
+  box-shadow: inset 0.35rem 0 0 var(--color-accent);
+  padding-inline-start: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
