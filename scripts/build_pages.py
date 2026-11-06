@@ -25,7 +25,7 @@ ORG = {
     "url": "https://www.sharprecords.co.uk/",
     "logo": "https://www.sharprecords.co.uk/assets/img/logo-vinyl.svg",
     "image": "https://www.sharprecords.co.uk/assets/img/og-image.png",
-    "description": "Independent electronic music label from Manchester. A platform for music, art and culture. No fixed genre. No creative limits. No compromise.",
+    "description": "Independent electronic music label from Manchester. A platform for music, art and culture. No fixed genres. No creative limits. No compromises.",
     "foundingLocation": {
         "@type": "Place",
         "name": "Manchester",
@@ -138,7 +138,7 @@ def footer(current: str) -> str:
       <div>
         <a class="brand" href="index.html">Sharp Records</a>
         <p>An independent electronic music label from Manchester. A platform for music, art and culture.</p>
-        <p>No fixed genre. No creative limits. No compromise.</p>
+        <p>No fixed genres. No creative limits. No compromises.</p>
       </div>
       <div>
         <p class="eyebrow">Explore</p>
@@ -157,7 +157,7 @@ def footer(current: str) -> str:
     </div>
     <p class="wrap footer-mark" aria-hidden="true">SHARP</p>
   </footer>
-  <script type="module" src="assets/js/main.js?v=20261106d"></script>"""
+  <script type="module" src="assets/js/main.js?v=20261106e"></script>"""
 
 
 def head(title: str, description: str, canonical: str, jsonld: str) -> str:
@@ -187,7 +187,7 @@ def head(title: str, description: str, canonical: str, jsonld: str) -> str:
   <link rel="manifest" href="site.webmanifest">
   <link rel="preload" href="assets/fonts/oswald.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261106d">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261106e">
   <script type="application/ld+json">
 {jsonld}
   </script>
@@ -242,8 +242,8 @@ def main() -> None:
     # ALBUM already has \u2019 in the source file which becomes ’ in the .py then the curly apostrophe.
     page(
         "index.html",
-        "Sharp Records — No fixed genre. No creative limits. No compromise.",
-        "Sharp Records is an independent electronic music label from Manchester. A platform for music, art and culture. No fixed genre. No creative limits. No compromise.",
+        "Sharp Records — No fixed genres. No creative limits. No compromises.",
+        "Sharp Records is an independent electronic music label from Manchester. A platform for music, art and culture. No fixed genres. No creative limits. No compromises.",
         "https://www.sharprecords.co.uk/",
         "index.html",
         "index.main.html",
