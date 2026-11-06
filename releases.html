@@ -69,6 +69,7 @@
       "@type": "MusicAlbum",
       "name": "Bloom’s Village",
       "catalogNumber": "SR001",
+      "image": "https://www.sharprecords.co.uk/assets/img/sr001-cover.jpg",
       "byArtist": {
         "@type": "MusicGroup",
         "name": "Bloom’s Village",
@@ -138,7 +139,10 @@
       <div class="wrap">
         <article class="release" id="sr001">
           <div class="release__art">
-            <img src="assets/img/art-sr001.webp" width="1000" height="1000" alt="Abstract grainy monochrome artwork for Bloom’s Village: clustered lights in fog, framed like a print.">
+            <picture>
+              <source type="image/webp" srcset="assets/img/sr001-cover-600.webp 600w, assets/img/sr001-cover.webp 1200w" sizes="(min-width: 52rem) min(40vw, 28rem), 100vw">
+              <img src="assets/img/sr001-cover.jpg" srcset="assets/img/sr001-cover-600.jpg 600w, assets/img/sr001-cover.jpg 1200w" sizes="(min-width: 52rem) min(40vw, 28rem), 100vw" width="1200" height="1200" alt="Bloom's Village (SR001) cover artwork">
+            </picture>
             <p class="release__cat" aria-hidden="true">SR001</p>
           </div>
           <div>

@@ -133,7 +133,8 @@ def make_sr001() -> None:
     m = 48
     d.rectangle([m, m, w - m, h - m], outline=(242, 240, 234), width=1)
     d.rectangle([m + 8, m + 8, w - m - 8, h - m - 8], outline=(90, 90, 88), width=1)
-    save_webp(img, "art-sr001.webp", quality=80)
+    # SR001 cover is real artwork (assets/img/sr001-cover.*); do not overwrite with generated placeholder.
+    # save_webp(img, "art-sr001.webp", quality=80)
 
 
 def make_artist() -> None:

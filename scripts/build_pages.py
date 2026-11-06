@@ -78,6 +78,7 @@ ALBUM = {
     "@type": "MusicAlbum",
     "name": "Bloom\u2019s Village",
     "catalogNumber": "SR001",
+    "image": "https://www.sharprecords.co.uk/assets/img/sr001-cover.jpg",
     "byArtist": {
         "@type": "MusicGroup",
         "name": "Bloom\u2019s Village",
