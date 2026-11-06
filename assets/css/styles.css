@@ -322,7 +322,7 @@ h3 { font-size: var(--step-1); margin: 0 0 var(--space-xs); }
 .hero__frame {
   width: var(--wrap);
   margin-inline: auto;
-  padding-block: clamp(2.2rem, 3.5vw, 4.25rem) var(--space-md);
+  padding-block: clamp(1.4rem, 2.4vw, 2.75rem) var(--space-sm);
 }
 
 .hero__mast {
@@ -330,8 +330,8 @@ h3 { font-size: var(--step-1); margin: 0 0 var(--space-xs); }
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 0.5rem 1.5rem;
-  margin: 0 0 var(--space-md);
-  padding-block-end: 0.85rem;
+  margin: 0 0 var(--space-sm);
+  padding-block-end: 0.7rem;
   border-block-end: 1px solid var(--color-line);
   font-family: var(--font-mono);
   font-size: 0.68rem;
@@ -342,7 +342,7 @@ h3 { font-size: var(--step-1); margin: 0 0 var(--space-xs); }
 
 .hero__grid {
   display: grid;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   align-items: end;
 }
 
@@ -377,9 +377,15 @@ h3 { font-size: var(--step-1); margin: 0 0 var(--space-xs); }
 }
 
 .hero__mark img {
-  width: min(100%, 28rem);
+  width: min(100%, 34rem);
   height: auto;
+  grid-area: 1 / 1;
+}
+
+.hero__vinyl {
   animation: vinyl-spin 90s linear infinite;
+  /* Disc rim ends just inside 36.5% of the 2000 canvas, so the plate stays outside the spin. */
+  clip-path: circle(36.55% at 50% 50%);
 }
 
 .hero__accent {
@@ -574,6 +580,36 @@ h3 { font-size: var(--step-1); margin: 0 0 var(--space-xs); }
 }
 
 .section--paper .tracklist li { border-color: rgba(13, 13, 13, 0.14); }
+
+.tracklist--playable > li {
+  display: block;
+}
+
+.track {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(6.5rem, auto) minmax(10.5rem, 1fr);
+  align-items: center;
+  gap: 0.5rem 0.85rem;
+}
+
+@media (max-width: 36rem) {
+  .track {
+    grid-template-columns: 1.75rem 1fr;
+  }
+
+  .track .preview {
+    grid-column: 1 / -1;
+  }
+}
+
+.track__index,
+.track__title {
+  font-family: var(--font-mono);
+}
+
+.track__title {
+  min-width: 0;
+}
 
 /* Artist */
 .artist {
@@ -856,28 +892,75 @@ a.media:hover img,
 
 /* Preview player */
 .preview {
-  margin-block: var(--space-md) 0;
-  max-inline-size: 28rem;
-}
-
-.preview__meta {
-  margin-block-end: var(--space-xs);
-}
-
-.preview__row {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.55rem;
+  min-width: 0;
+  margin: 0;
 }
 
 .preview__btn {
-  min-inline-size: 14rem;
+  flex: 0 0 2rem;
+  width: 2rem;
+  height: 2rem;
+  min-inline-size: 2rem;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--color-fg);
+  background: var(--color-bg);
+  color: var(--color-fg);
+  cursor: pointer;
+}
+
+.preview__btn:hover,
+.preview__btn:focus-visible {
+  background: var(--color-fg);
+  color: var(--color-bg);
 }
 
 .preview__btn[aria-pressed="true"] {
   background: var(--color-fg);
   color: var(--color-bg);
+}
+
+.preview__icon {
+  width: 0.85rem;
+  height: 0.85rem;
+  display: block;
+}
+
+.preview__btn .preview__icon--pause { display: none; }
+.preview__btn[aria-pressed="true"] .preview__icon--play { display: none; }
+.preview__btn[aria-pressed="true"] .preview__icon--pause { display: block; }
+
+.preview__wave {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 1.7rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.preview__bar {
+  flex: 1 1 0;
+  width: 100%;
+  min-width: 1px;
+  height: max(18%, calc(var(--peak, 0.2) * 100%));
+  background: var(--color-muted);
+  opacity: 0.45;
+  transform-origin: center bottom;
+}
+
+.preview__bar.is-played {
+  background: var(--color-fg);
+  opacity: 1;
+}
+
+.preview.is-playing .preview__bar {
+  transform: scaleY(var(--live-amp, 1));
 }
 
 .preview__native {
@@ -898,30 +981,18 @@ html.js .preview__native {
 }
 
 .preview__time {
+  flex: 0 0 auto;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
   color: var(--color-muted);
-  min-inline-size: 2.5rem;
-}
-
-.preview__progress {
-  margin-block-start: 0.65rem;
-  height: 2px;
-  background: var(--color-faint);
-  overflow: hidden;
-}
-
-.preview__bar {
-  height: 100%;
-  width: 0%;
-  background: var(--color-fg);
-  transform-origin: left center;
+  white-space: nowrap;
+  min-inline-size: 5.6rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .preview__bar {
-    transition: none;
+  .preview.is-playing .preview__bar {
+    transform: none;
   }
 }
 

@@ -178,7 +178,7 @@ if (form) {
 }
 
 
-/* 15-second release preview players */
+/* Compact 15-second waveform preview players */
 (() => {
   const players = Array.from(document.querySelectorAll("[data-preview]"));
   if (!players.length) return;
@@ -193,12 +193,68 @@ if (form) {
     return `${m}:${String(sec).padStart(2, "0")}`;
   };
 
+  const trackTitle = (root) => root.dataset.trackTitle || "track";
+
+  let sharedCtx = null;
+  let analyser = null;
+  const mediaSources = new WeakMap();
+
+  const ensureGraph = (audio) => {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx || reduceMotion) return null;
+    try {
+      if (!sharedCtx) {
+        sharedCtx = new Ctx();
+        analyser = sharedCtx.createAnalyser();
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.72;
+        analyser.connect(sharedCtx.destination);
+      }
+      if (!mediaSources.has(audio)) {
+        const src = sharedCtx.createMediaElementSource(audio);
+        src.connect(analyser);
+        mediaSources.set(audio, src);
+      }
+      return analyser;
+    } catch {
+      return null;
+    }
+  };
+
   const setPlaying = (root, playing) => {
     const btn = root.querySelector("[data-preview-btn]");
-    const label = root.querySelector("[data-preview-label]");
     if (!btn) return;
     btn.setAttribute("aria-pressed", playing ? "true" : "false");
-    if (label) label.textContent = playing ? "Pause preview — 0:15" : "Play preview — 0:15";
+    const title = trackTitle(root);
+    btn.setAttribute("aria-label", playing ? `Pause preview of ${title}` : `Play preview of ${title}`);
+    root.classList.toggle("is-playing", playing);
+    if (!playing) root.style.removeProperty("--live-amp");
+  };
+
+  const parsePeaks = (root) => {
+    try {
+      const raw = JSON.parse(root.getAttribute("data-peaks") || "[]");
+      if (Array.isArray(raw) && raw.length) return raw.map((n) => Number(n) || 0);
+    } catch {
+      /* fall through */
+    }
+    return Array(72).fill(0.35);
+  };
+
+  const renderWave = (root) => {
+    const wave = root.querySelector("[data-preview-wave]");
+    if (!wave) return [];
+    const peaks = parsePeaks(root);
+    wave.replaceChildren();
+    wave.hidden = false;
+    return peaks.map((peak) => {
+      const span = document.createElement("span");
+      span.className = "preview__bar";
+      span.style.setProperty("--peak", String(Math.max(0.08, Math.min(1, peak))));
+      span.setAttribute("aria-hidden", "true");
+      wave.append(span);
+      return span;
+    });
   };
 
   const pauseOthers = (except) => {
@@ -213,32 +269,54 @@ if (form) {
   players.forEach((root) => {
     const audio = root.querySelector("[data-preview-audio]");
     const btn = root.querySelector("[data-preview-btn]");
-    const bar = root.querySelector("[data-preview-bar]");
     const timeEl = root.querySelector("[data-preview-time]");
-    const progress = root.querySelector("[data-preview-progress]");
+    const wave = root.querySelector("[data-preview-wave]");
     if (!audio || !btn) return;
 
-    // Progressive enhancement: custom button replaces native controls UI
+    const bars = renderWave(root);
     btn.hidden = false;
-    if (timeEl) timeEl.hidden = false;
-    if (progress) progress.hidden = false;
+    if (timeEl) {
+      timeEl.hidden = false;
+      timeEl.textContent = "0:00 / 0:15";
+    }
     audio.removeAttribute("controls");
 
-    const sync = () => {
+    const paint = () => {
       const t = Math.min(audio.currentTime || 0, MAX);
-      if (timeEl) timeEl.textContent = fmt(t);
-      if (bar) {
-        const pct = (t / MAX) * 100;
-        if (reduceMotion) bar.style.width = `${pct}%`;
-        else bar.style.width = `${pct}%`;
+      const progress = bars.length ? t / MAX : 0;
+      if (timeEl) timeEl.textContent = `${fmt(t)} / 0:15`;
+      bars.forEach((bar, i) => {
+        bar.classList.toggle("is-played", (i + 0.5) / bars.length <= progress);
+      });
+      if (!reduceMotion && analyser && !audio.paused) {
+        const buf = new Uint8Array(analyser.fftSize);
+        analyser.getByteTimeDomainData(buf);
+        let sum = 0;
+        for (let i = 0; i < buf.length; i += 1) {
+          const v = (buf[i] - 128) / 128;
+          sum += v * v;
+        }
+        const amp = Math.min(1, Math.sqrt(sum / buf.length) * 3.4);
+        root.style.setProperty("--live-amp", (0.86 + amp * 0.42).toFixed(3));
       }
-      if (t >= MAX - 0.05) {
+      if (t >= MAX - 0.05 && !audio.paused) {
         audio.pause();
         audio.currentTime = 0;
         setPlaying(root, false);
-        if (timeEl) timeEl.textContent = "0:00";
-        if (bar) bar.style.width = "0%";
+        if (timeEl) timeEl.textContent = "0:00 / 0:15";
+        bars.forEach((bar) => bar.classList.remove("is-played"));
       }
+    };
+
+    let raf = 0;
+    const tick = () => {
+      paint();
+      if (!audio.paused) raf = requestAnimationFrame(tick);
+    };
+
+    const startTick = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(tick);
     };
 
     btn.addEventListener("click", () => {
@@ -246,26 +324,57 @@ if (form) {
         pauseOthers(root);
         if (audio.currentTime >= MAX) audio.currentTime = 0;
         setPlaying(root, true);
+        ensureGraph(audio);
+        if (sharedCtx && sharedCtx.state === "suspended") {
+          sharedCtx.resume().catch(() => {});
+        }
         const playPromise = audio.play();
         if (playPromise && typeof playPromise.catch === "function") {
           playPromise.catch(() => setPlaying(root, false));
         }
+        startTick();
       } else {
         audio.pause();
         setPlaying(root, false);
       }
     });
 
-    audio.addEventListener("timeupdate", sync);
+    if (wave) {
+      const seekFromEvent = (event) => {
+        const rect = wave.getBoundingClientRect();
+        if (!rect.width) return;
+        const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+        audio.currentTime = ratio * MAX;
+        paint();
+      };
+      let dragging = false;
+      wave.addEventListener("click", seekFromEvent);
+      wave.addEventListener("pointerdown", (event) => {
+        dragging = true;
+        if (wave.setPointerCapture) wave.setPointerCapture(event.pointerId);
+        seekFromEvent(event);
+      });
+      wave.addEventListener("pointermove", (event) => {
+        if (dragging) seekFromEvent(event);
+      });
+      const stopDrag = () => { dragging = false; };
+      wave.addEventListener("pointerup", stopDrag);
+      wave.addEventListener("pointercancel", stopDrag);
+    }
+
+    audio.addEventListener("timeupdate", paint);
     audio.addEventListener("ended", () => {
       audio.currentTime = 0;
       setPlaying(root, false);
-      if (timeEl) timeEl.textContent = "0:00";
-      if (bar) bar.style.width = "0%";
+      if (timeEl) timeEl.textContent = "0:00 / 0:15";
+      bars.forEach((bar) => bar.classList.remove("is-played"));
     });
     audio.addEventListener("pause", () => {
       if (audio.currentTime < MAX - 0.05) setPlaying(root, false);
     });
-    audio.addEventListener("play", () => setPlaying(root, true));
+    audio.addEventListener("play", () => {
+      setPlaying(root, true);
+      startTick();
+    });
   });
 })();

@@ -76,8 +76,7 @@ EVENTS = [
 
 ALBUM = {
     "@type": "MusicAlbum",
-    "name": "Untitled EP",
-    "alternateName": "Bloom\u2019s Village",
+    "name": "Bloom\u2019s Village",
     "catalogNumber": "SR001",
     "byArtist": {
         "@type": "MusicGroup",
@@ -87,7 +86,12 @@ ALBUM = {
     "numTracks": 3,
     "genre": "Experimental Electronic",
     "publisher": {"@id": "https://www.sharprecords.co.uk/#label"},
-    "description": "Three-track experimental electronic EP from Manchester artist Will Holton, working as Bloom\u2019s Village. The first Sharp Records pressing.",
+    "description": "Three-track experimental electronic EP from Manchester artist Will Holton, working as Bloom\u2019s Village: Flippin, Spinning Rhythms and Got My Mind. The first Sharp Records pressing.",
+    "track": [
+        {"@type": "MusicRecording", "name": "Flippin", "position": 1},
+        {"@type": "MusicRecording", "name": "Spinning Rhythms", "position": 2},
+        {"@type": "MusicRecording", "name": "Got My Mind", "position": 3},
+    ],
 }
 
 

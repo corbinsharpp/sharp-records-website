@@ -246,54 +246,90 @@ test.describe("enquire form", () => {
   });
 });
 
+test.describe("SR001 track previews", () => {
+  const tracks = ["Flippin", "Spinning Rhythms", "Got My Mind"];
 
-test.describe("SR001 Flippin preview", () => {
-  test("homepage preview button exists and toggles aria-pressed", async ({ page, request, baseURL }) => {
+  async function expectNamedPlayers(page, request, baseURL, rootSelector) {
+    const root = page.locator(rootSelector);
+    await expect(root).toBeVisible();
+    await expect(root.getByText("Untitled")).toHaveCount(0);
+    await expect(root.getByText("TBA")).toHaveCount(0);
+    await expect(root.getByText(/Play preview/i)).toHaveCount(0);
+
+    const players = root.locator("[data-preview]");
+    await expect(players).toHaveCount(3);
+
+    for (const name of tracks) {
+      await expect(root.locator(".track__title", { hasText: name })).toHaveCount(1);
+      const player = root.locator(`[data-preview][data-track-title="${name}"]`);
+      await expect(player).toHaveCount(1);
+      const btn = player.locator("[data-preview-btn]");
+      await expect(btn).toBeVisible();
+      await expect(btn).toHaveAttribute("aria-pressed", "false");
+      await expect(btn).toHaveAttribute("aria-label", `Play preview of ${name}`);
+
+      const sources = await player.locator("audio[data-preview-audio] source").evaluateAll((els) =>
+        els.map((el) => el.getAttribute("src"))
+      );
+      expect(sources.length, `${name} should have audio sources`).toBeGreaterThan(0);
+      for (const src of sources) {
+        const url = new URL(src, baseURL).href;
+        const res = await request.get(url);
+        expect(res.status(), `${src} should be 200`).toBe(200);
+      }
+    }
+  }
+
+  test("homepage lists three named tracks, each with a play button and audio", async ({ page, request, baseURL }) => {
     const errors = attachConsole(page);
     await page.goto("/index.html", { waitUntil: "networkidle" });
+    await expectNamedPlayers(page, request, baseURL, "#home-sr001");
 
-    const home = page.locator("#home-sr001");
-    await expect(home).toBeVisible();
-    const btn = home.locator("[data-preview-btn]");
-    await expect(btn).toBeVisible();
-    await expect(btn).toHaveAttribute("aria-pressed", "false");
-    await expect(btn).toContainText(/Play preview/i);
-
-    const audio = home.locator("audio[data-preview-audio]");
-    await expect(audio).toHaveCount(1);
-    const sources = await audio.locator("source").evaluateAll((els) =>
-      els.map((el) => el.getAttribute("src"))
-    );
-    expect(sources.length).toBeGreaterThan(0);
-
-    for (const src of sources) {
-      const url = new URL(src, baseURL).href;
-      const res = await request.get(url);
-      expect(res.status(), `${src} should be 200`).toBe(200);
-    }
-
+    const btn = page.locator('#home-sr001 [data-preview][data-track-title="Flippin"] [data-preview-btn]');
     await btn.click();
     await expect(btn).toHaveAttribute("aria-pressed", "true", { timeout: 5000 });
+    await expect(btn).toHaveAttribute("aria-label", "Pause preview of Flippin");
     await btn.click();
     await expect(btn).toHaveAttribute("aria-pressed", "false");
+    await expect(btn).toHaveAttribute("aria-label", "Play preview of Flippin");
     expect(errors).toEqual([]);
   });
 
-  test("releases page SR001 preview button and audio sources", async ({ page, request, baseURL }) => {
+  test("releases page lists three named tracks, each with a play button and audio", async ({ page, request, baseURL }) => {
     await page.goto("/releases.html#sr001", { waitUntil: "networkidle" });
-    const release = page.locator("#sr001");
-    await expect(release).toBeVisible();
-    const btn = release.locator("[data-preview-btn]");
-    await expect(btn).toBeVisible();
-    await expect(btn).toHaveAttribute("aria-pressed", "false");
+    await expectNamedPlayers(page, request, baseURL, "#sr001");
 
-    const src = await release.locator("audio[data-preview-audio] source").first().getAttribute("src");
-    const res = await request.get(new URL(src, baseURL).href);
-    expect(res.status()).toBe(200);
-
+    const btn = page.locator('#sr001 [data-preview][data-track-title="Got My Mind"] [data-preview-btn]');
     await btn.click();
     await expect(btn).toHaveAttribute("aria-pressed", "true", { timeout: 5000 });
     await btn.click();
     await expect(btn).toHaveAttribute("aria-pressed", "false");
   });
+
+  test("only one preview plays at a time", async ({ page }) => {
+    const errors = attachConsole(page);
+    await page.goto("/index.html", { waitUntil: "networkidle" });
+    const flip = page.locator('#home-sr001 [data-preview][data-track-title="Flippin"] [data-preview-btn]');
+    const spin = page.locator('#home-sr001 [data-preview][data-track-title="Spinning Rhythms"] [data-preview-btn]');
+    await flip.click();
+    await expect(flip).toHaveAttribute("aria-pressed", "true", { timeout: 5000 });
+    await spin.click();
+    await expect(spin).toHaveAttribute("aria-pressed", "true", { timeout: 5000 });
+    await expect(flip).toHaveAttribute("aria-pressed", "false");
+    expect(errors).toEqual([]);
+  });
+
+  test("no Untitled placeholders remain on pages or in JSON-LD", async ({ page }) => {
+    const files = ["index.html", "releases.html", "artists.html", "culture.html", "enquire.html"];
+    const root = path.join(__dirname, "..");
+    for (const file of files) {
+      const text = fs.readFileSync(path.join(root, file), "utf8");
+      expect(text.includes("Untitled"), `${file} should not contain Untitled`).toBeFalsy();
+    }
+    for (const p of ["index.html", "releases.html", "artists.html", "culture.html"]) {
+      await page.goto(`/${p}`, { waitUntil: "domcontentloaded" });
+      await expect(page.getByText("Untitled")).toHaveCount(0);
+    }
+  });
 });
+
