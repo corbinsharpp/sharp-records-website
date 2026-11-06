@@ -1215,3 +1215,58 @@ html.js .preview__native {
   pointer-events: none;
 }
 .preview.has-played .preview__disc { inline-size: 1.5rem; }
+
+/* Record v4: a proper little vinyl. Black disc, fine white grooves, a fixed light
+   sheen, and the vinyl logo as the spinning centre label. */
+.preview__disc,
+.preview.has-played .preview__disc {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.85rem;
+  block-size: 1.85rem;
+  margin-inline-start: 0;
+  opacity: 1;
+  overflow: hidden;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 0 0.42rem, #050505 0.42rem 0.47rem, transparent 0.47rem),
+    repeating-radial-gradient(circle at 50% 50%,
+      #0a0a0a 0 1.2px,
+      rgba(242, 240, 234, 0.32) 1.2px 1.7px,
+      #0a0a0a 1.7px 2.6px),
+    #0a0a0a;
+  box-shadow: 0 0 0 1px rgba(242, 240, 234, 0.85), 0 0 0 2px #0d0d0d;
+}
+
+.preview__disc img {
+  position: relative;
+  z-index: 1;
+  inline-size: 1.05rem;
+  block-size: 1.05rem;
+  border-radius: 50%;
+}
+
+/* Fixed sheen: two soft light wedges, like a real record under a light. */
+.preview__disc::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 20deg,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.22) 25deg,
+    transparent 55deg,
+    transparent 180deg,
+    rgba(255, 255, 255, 0.16) 205deg,
+    transparent 235deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 0.5rem, #000 0.52rem);
+          mask: radial-gradient(circle, transparent 0 0.5rem, #000 0.52rem);
+  pointer-events: none;
+}
+
+/* Spin the whole record (grooves + label); the sheen stays put. */
+.preview__disc img { animation: preview-disc-spin 1.8s linear infinite; animation-play-state: paused; }
+.preview.is-playing .preview__disc img { animation-play-state: running; }
