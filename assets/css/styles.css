@@ -1214,3 +1214,4 @@ html.js .preview__native {
           mask: radial-gradient(circle, transparent 0 0.42rem, #000 0.43rem);
   pointer-events: none;
 }
+.preview.has-played .preview__disc { inline-size: 1.5rem; }
