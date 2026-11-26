@@ -1,7 +1,7 @@
 import { defineConfig } from "astro/config";
 import sitemap from "@astrojs/sitemap";
 
-const site = (process.env.PUBLIC_SITE_URL || "https://www.sharprecords.co.uk").replace(/\/$/, "");
+const site = (process.env.PUBLIC_SITE_URL || "https://sharprecords.uk").replace(/\/$/, "");
 
 export default defineConfig({
   site,

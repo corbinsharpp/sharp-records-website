@@ -2,11 +2,11 @@
 
 No. The website, the dashboard, the enquiry form, the spam check, analytics and the newsletter all stay on free plans. You do not need a credit card to set them up. Do not enter a card when a site offers a trial: pick the free plan. Nothing here bills you unless you later click an upgrade yourself.
 
-The only expected cost is the domain name **sharprecords.co.uk**. That is the yearly fee charged by the company you registered it with. Attaching the domain to the site is free.
+The only expected cost is the domain name **sharprecords.uk**. That is the yearly fee charged by the company you registered it with. Attaching the domain to the site is free.
 
 | Service | What it does | Cost now | Free allowance | What would start a charge |
 | --- | --- | --- | --- | --- |
-| Domain name | The address sharprecords.co.uk | The only expected cost | Connecting it to Cloudflare is free | The registrar’s renewal. Cloudflare does not charge for the connection. |
+| Domain name | The address sharprecords.uk | The only expected cost | Connecting it to Cloudflare is free | The registrar’s renewal. Cloudflare does not charge for the connection. |
 | Cloudflare Pages | Hosts the site | Free | Unlimited visits and bandwidth. 500 rebuilds a month. Up to 100 domains on the project. | More than 500 rebuilds in a month, which needs a paid Cloudflare plan. Publishing a few times a week stays inside the free allowance. |
 | Cloudflare Workers (the small form and sign-in programs) | Sends enquiries, newsletter sign-ups and dashboard login | Free | 100,000 of these requests a day. Ordinary page views do not count. | More than 100,000 of those requests in one day. The paid Workers plan is $5 a month. A label site does not get near this. |
 | Decap CMS | The dashboard at /admin | Free | No fee and no per-person charge. It is open source. | Nothing. There is no paid Decap plan to fall into. |
@@ -35,27 +35,35 @@ Do these in order.
    - Build output directory: `dist`
 5. Press **Save and Deploy**. The first address will look like `sharp-records.pages.dev`. The dashboard at `/admin` on that address will not sign in until step 3, because GitHub only allows one callback address and yours should be the real domain.
 
-## 2. Connect sharprecords.co.uk
+## 2. Connect sharprecords.uk
+
+The live address is the apex, **https://sharprecords.uk**, with no www. The dashboard login uses that same address. `www.sharprecords.uk` only redirects there, so there is one site and one login callback.
 
 1. In the Pages project, open **Custom domains** → **Set up a custom domain**.
-2. Type `www.sharprecords.co.uk` and follow the instructions Cloudflare shows. It will tell you which records to add where the domain is registered.
-3. Add `sharprecords.co.uk` (without www) as well, and let Cloudflare redirect it to `www`.
-4. Wait until both say **Active**. The site is then at https://www.sharprecords.co.uk/.
+2. Type `sharprecords.uk` (no www). Cloudflare shows the DNS records to add where the domain is registered. Add those records. If the domain’s nameservers are already on Cloudflare, it can add them for you.
+3. Wait until `sharprecords.uk` says **Active**. The site is then at https://sharprecords.uk/.
+4. Add `www.sharprecords.uk` as a second custom domain on the same project, and add the DNS record Cloudflare shows for it.
+5. Send www to the apex. In the Cloudflare account for this domain, open **Rules** → **Redirect Rules** → **Create rule**.
+   - Name: `www to apex`
+   - If: Hostname equals `www.sharprecords.uk`
+   - Then: Dynamic redirect to `https://sharprecords.uk` plus the original path, status **301**
+   - Preserve the query string
+6. Check both in a browser: `https://sharprecords.uk/` opens the site, and `https://www.sharprecords.uk/` lands on `https://sharprecords.uk/`.
 
 ## 3. Let the dashboard sign in with GitHub
 
 1. On GitHub, open **Settings** (your user settings, not the repository) → **Developer settings** → **OAuth Apps** → **New OAuth App**.
 2. Fill in:
    - Application name: `Sharp Records site`
-   - Homepage URL: `https://www.sharprecords.co.uk`
-   - Authorization callback URL: `https://www.sharprecords.co.uk/api/callback`
+   - Homepage URL: `https://sharprecords.uk`
+   - Authorization callback URL: `https://sharprecords.uk/api/callback`
 3. Press **Register application**. Copy the **Client ID**.
 4. Press **Generate a new client secret**. Copy the secret straight away. GitHub will not show it again.
 5. In Cloudflare Pages → your project → **Settings** → **Variables and Secrets**, add:
    - `GITHUB_CLIENT_ID` = the Client ID
    - `GITHUB_CLIENT_SECRET` = the secret (mark this one as a secret / encrypted)
 6. Press **Save**, then **Deployments** → **Retry deployment** on the latest build so the new values are used.
-7. Open https://www.sharprecords.co.uk/admin and press **Login with GitHub**. Use the GitHub account that owns the repository.
+7. Open https://sharprecords.uk/admin and press **Login with GitHub**. Use the GitHub account that owns the repository.
 
 ## 4. Enquiry form: spam check and delivery
 
@@ -64,7 +72,7 @@ The form will not send until both of these exist. Visitors can still email corbi
 **Cloudflare Turnstile (the “I am a person” check, free)**
 
 1. In the Cloudflare dashboard open **Turnstile** → **Add widget**.
-2. Widget name: `Sharp Records`. Domains: `sharprecords.co.uk` and `www.sharprecords.co.uk`.
+2. Widget name: `Sharp Records`. Domains: `sharprecords.uk` and `www.sharprecords.uk`.
 3. Widget mode: Managed. Press **Create**.
 4. Copy the **Site key** and the **Secret key**.
 
@@ -96,7 +104,7 @@ The wording of the newsletter box is edited in the Sharp dashboard under **Setti
 
 ## 6. Google Analytics, only after someone accepts cookies
 
-1. Go to https://analytics.google.com/ and create an account and a **GA4** property for Sharp Records. The site address is `https://www.sharprecords.co.uk`.
+1. Go to https://analytics.google.com/ and create an account and a **GA4** property for Sharp Records. The site address is `https://sharprecords.uk`.
 2. Add a **Web** data stream for that address.
 3. Copy the Measurement ID. It looks like `G-` followed by letters and numbers.
 4. In Cloudflare, add `PUBLIC_GA_MEASUREMENT_ID` with that value.
@@ -127,7 +135,7 @@ Open http://127.0.0.1:4321/admin in Chrome, Edge or Firefox. With `npm run cms` 
 
 ## Using the dashboard
 
-The address on the live site is https://www.sharprecords.co.uk/admin. Sign in with GitHub once the OAuth app from the steps above exists.
+The address on the live site is https://sharprecords.uk/admin. Sign in with GitHub once the OAuth app from the steps above exists.
 
 The left-hand list is the kind of thing you are editing:
 

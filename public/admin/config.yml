@@ -9,11 +9,11 @@ backend:
   name: github
   repo: corbinsharpp/sharp-records-website
   branch: main
-  base_url: https://www.sharprecords.co.uk
+  base_url: https://sharprecords.uk
   auth_endpoint: api/auth
 
-site_url: https://www.sharprecords.co.uk
-display_url: https://www.sharprecords.co.uk
+site_url: https://sharprecords.uk
+display_url: https://sharprecords.uk
 show_preview_links: true
 logo_url: /assets/img/logo-vinyl.svg
 

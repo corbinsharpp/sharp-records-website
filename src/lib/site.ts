@@ -1,4 +1,4 @@
-export const SITE = (import.meta.env.PUBLIC_SITE_URL || "https://www.sharprecords.co.uk").replace(/\/$/, "");
+export const SITE = (import.meta.env.PUBLIC_SITE_URL || "https://sharprecords.uk").replace(/\/$/, "");
 
 export function absolute(path: string): string {
   if (path.startsWith("http://") || path.startsWith("https://")) return path;

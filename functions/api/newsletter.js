@@ -43,7 +43,7 @@ export async function onRequest(context) {
     body: JSON.stringify({
       email_address: data.email.trim(),
       tags: ["website"],
-      metadata: { source: "sharprecords.co.uk" },
+      metadata: { source: "sharprecords.uk" },
     }),
   });
 
