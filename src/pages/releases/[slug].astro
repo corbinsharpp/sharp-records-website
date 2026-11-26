@@ -1,0 +1,64 @@
+---
+import { getCollection, getEntry } from "astro:content";
+import Layout from "../../components/Layout.astro";
+import SmartImage from "../../components/SmartImage.astro";
+import Tracklist from "../../components/Tracklist.astro";
+import Share from "../../components/Share.astro";
+import Embeds from "../../components/Embeds.astro";
+import { getSite } from "../../lib/content";
+import { organization, albumSchema } from "../../lib/schema";
+import { shareImage } from "../../lib/images";
+
+export async function getStaticPaths() {
+  const releases = await getCollection("releases");
+  return releases.map((release) => ({ params: { slug: release.id } }));
+}
+
+const { slug } = Astro.params;
+const release = await getEntry("releases", slug!);
+if (!release) throw new Error("Missing release");
+const site = await getSite();
+const artist = site.artistsById.get(release.data.artist);
+const image = await shareImage(release.data.cover);
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    organization({
+      email: site.settings.data.email,
+      city: site.settings.data.city,
+      country: site.settings.data.country,
+      countryCode: site.settings.data.countryCode,
+      genres: site.genres,
+      description: site.homepage.data.seoDescription,
+    }),
+    albumSchema(release, artist, image),
+  ],
+};
+const meta = [release.data.catalogNumber, release.data.format, release.data.genre].filter(Boolean).join(" · ");
+---
+
+<Layout title={`${release.data.title} | Sharp Records`} description={release.data.summary} ogImage={image} ogType="music.album" jsonLd={jsonLd}>
+  <header class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">{meta}</p>
+      <h1>{release.data.title}</h1>
+      <p class="lede">{release.data.summary}</p>
+    </div>
+  </header>
+  <section class="section">
+    <div class="wrap">
+      <article class="release" id={release.id}>
+        <div class="release__art">
+          <SmartImage src={release.data.cover} alt={release.data.coverAlt} sizes="(min-width: 52rem) min(40vw, 28rem), 100vw" loading="eager" />
+          <p class="release__tag" aria-hidden="true">{release.data.catalogNumber}</p>
+        </div>
+        <div>
+          <Tracklist tracks={release.data.tracks} idPrefix={`detail-${release.id}`} />
+          <Embeds bandcamp={release.data.bandcamp} soundcloud={release.data.soundcloud} spotify={release.data.spotify} mixcloud={release.data.mixcloud} youtube={release.data.youtube} />
+          <Share path={`/releases/${release.id}.html`} title={`${release.data.title} — Sharp Records`} />
+          {artist && <p><a class="text-link" href={`/artists.html#${artist.id}`}>The artist</a></p>}
+        </div>
+      </article>
+    </div>
+  </section>
+</Layout>

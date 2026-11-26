@@ -1,0 +1,52 @@
+---
+import { getCollection, getEntry, render } from "astro:content";
+import Layout from "../../components/Layout.astro";
+import SmartImage from "../../components/SmartImage.astro";
+import Share from "../../components/Share.astro";
+import { getSite, releasesFor } from "../../lib/content";
+import { organization, artistSchema } from "../../lib/schema";
+import { shareImage } from "../../lib/images";
+
+export async function getStaticPaths() {
+  const artists = await getCollection("artists");
+  return artists.map((artist) => ({ params: { slug: artist.id } }));
+}
+
+const artist = await getEntry("artists", Astro.params.slug!);
+if (!artist) throw new Error("Missing artist");
+const site = await getSite();
+const { Content } = await render(artist);
+const image = await shareImage(artist.data.photo);
+const work = releasesFor(artist.id, site.releases);
+---
+
+<Layout title={`${artist.data.name} | Sharp Records`} description={artist.data.name} ogImage={image} jsonLd={{ "@context": "https://schema.org", "@graph": [organization({ email: site.settings.data.email, city: site.settings.data.city, country: site.settings.data.country, countryCode: site.settings.data.countryCode, genres: site.genres, description: site.homepage.data.seoDescription }), artistSchema(artist, image)] }}>
+  <header class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">{artist.data.location} · {artist.data.style}</p>
+      <h1>{artist.data.name}</h1>
+    </div>
+  </header>
+  <section class="section">
+    <div class="wrap">
+      <article class="artist">
+        <div class="artist__visual">
+          <SmartImage src={artist.data.photo} alt={artist.data.photoAlt} sizes="(min-width: 52rem) 28rem, 100vw" loading="eager" />
+        </div>
+        <div>
+          <Content />
+          {work.length > 0 && (
+            <>
+              <p class="eyebrow">Selected work</p>
+              <ul class="tracklist">
+                {work.map((release) => <li><span>{release.data.title}</span><span>{release.data.catalogNumber}</span></li>)}
+              </ul>
+              <p><a class="button" href={`/releases.html#${work[0].id}`}>Listen now</a></p>
+            </>
+          )}
+          <Share path={`/artists/${artist.id}.html`} title={`${artist.data.name} — Sharp Records`} />
+        </div>
+      </article>
+    </div>
+  </section>
+</Layout>

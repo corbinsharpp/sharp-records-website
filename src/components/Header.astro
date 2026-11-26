@@ -1,0 +1,37 @@
+---
+const items = [
+  { href: "/releases.html", label: "Releases" },
+  { href: "/artists.html", label: "Artists" },
+  { href: "/events.html", label: "Events" },
+  { href: "/radio.html", label: "Radio" },
+  { href: "/culture.html", label: "Culture" },
+  { href: "/about.html", label: "About" },
+  { href: "/enquire.html", label: "Enquire" },
+];
+
+const path = Astro.url.pathname;
+function current(href: string) {
+  const stem = href.replace(/\.html$/, "");
+  return path === href || path.startsWith(`${stem}/`);
+}
+---
+
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="logo" href="/index.html">
+      <img src="/assets/img/logo-vinyl.svg" width="44" height="44" alt="">
+      <span>Sharp Records</span>
+    </a>
+    <button class="nav-toggle" type="button" data-nav-toggle aria-controls="site-nav" aria-expanded="false" aria-label="Open menu" hidden>
+      <span class="nav-toggle-label">Menu</span>
+    </button>
+    <nav class="site-nav" id="site-nav" data-nav aria-label="Primary">
+      <ul class="site-nav__list">
+        {items.map((item) => (
+          <li><a href={item.href} aria-current={current(item.href) ? "page" : undefined}>{item.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>

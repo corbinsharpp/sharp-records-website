@@ -1,0 +1,193 @@
+---
+import { render } from "astro:content";
+import Layout from "../components/Layout.astro";
+import ReleaseArticle from "../components/ReleaseArticle.astro";
+import ArtistArticle from "../components/ArtistArticle.astro";
+import EventArticle from "../components/EventArticle.astro";
+import CultureArticle from "../components/CultureArticle.astro";
+import SmartImage from "../components/SmartImage.astro";
+import { getSite } from "../lib/content";
+import { lines } from "../lib/text";
+import { organization, albumSchema, eventSchema } from "../lib/schema";
+import { shareImage } from "../lib/images";
+import { absolute } from "../lib/site";
+
+const site = await getSite();
+const { homepage, about, settings, sections, releases, artists, events, culture, artistsById, featuredRelease, featuredArtist, genres, mast, statement } = site;
+const { Content } = await render(about);
+const homeCulture = culture.filter((article) => article.data.featureOnHome);
+const cover = featuredRelease ? await shareImage(featuredRelease.data.cover) : undefined;
+const graph = [
+  organization({
+    email: settings.data.email,
+    city: settings.data.city,
+    country: settings.data.country,
+    countryCode: settings.data.countryCode,
+    genres,
+    description: homepage.data.seoDescription,
+    sameAs: settings.data.social.map((item) => item.url),
+  }),
+  {
+    "@type": "WebSite",
+    name: "Sharp Records",
+    url: absolute("/"),
+    description: homepage.data.seoDescription,
+    publisher: { "@id": `${absolute("/")}#label` },
+  },
+];
+if (featuredRelease) {
+  graph.push(albumSchema(featuredRelease, featuredRelease ? artistsById.get(featuredRelease.data.artist) : undefined, cover || ""));
+}
+for (const event of events) {
+  graph.push(eventSchema(event, event.data.performer ? artistsById.get(event.data.performer) : undefined));
+}
+const enquire = sections.enquire;
+const radio = sections.radio;
+---
+
+<Layout title={homepage.data.seoTitle} description={homepage.data.seoDescription} jsonLd={{ "@context": "https://schema.org", "@graph": graph }}>
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero__frame">
+      <p class="hero__mast">
+        {mast.map((item) => <span>{item}</span>)}
+      </p>
+      <div class="hero__grid">
+        <div class="hero__copy">
+          <p class="hero__kicker">{homepage.data.kicker}</p>
+          <h1 id="hero-heading" class="hero__statement">
+            {statement.map((line) => <span>{line}</span>)}
+          </h1>
+          <div class="button-row">
+            {featuredRelease && <a class="button" href={`/releases.html#${featuredRelease.id}`}>{homepage.data.listenLabel}</a>}
+            <a class="button button--ghost" href="/about.html">{homepage.data.manifestoButton}</a>
+          </div>
+        </div>
+        <div class="hero__mark">
+          <img class="hero__vinyl" src="/assets/img/logo-vinyl.svg" width="640" height="640" alt="Sharp Records logo: a vinyl disc with spiral Sharp Records lettering and an angular boxed S" fetchpriority="high">
+        </div>
+      </div>
+    </div>
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker__track">
+        {genres.map((genre) => <span>{genre}</span>)}
+        {genres.map((genre) => <span>{genre}</span>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--paper" aria-labelledby="manifesto-heading" data-reveal>
+    <div class="wrap">
+      <p class="section-index">{homepage.data.manifestoIndex}</p>
+      <h2 id="manifesto-heading" class="manifesto__open">{about.data.heading}</h2>
+      <div class="manifesto__body"><Content /></div>
+      <p class="manifesto__close">
+        {lines(about.data.closing).map((line, index) => (
+          <>
+            {index > 0 && <br />}
+            {line}
+          </>
+        ))}
+      </p>
+      <p><a class="text-link" href="/about.html">{homepage.data.manifestoLink}</a></p>
+    </div>
+  </section>
+
+  {featuredRelease && (
+    <section class="section" aria-labelledby="featured-heading" data-reveal>
+      <div class="wrap">
+        <div class="section__head">
+          <div>
+            <p class="section-index">{homepage.data.catalogueIndex}</p>
+            <h2 id="featured-heading">{homepage.data.catalogueHeading}</h2>
+          </div>
+          <a class="text-link" href="/releases.html">{homepage.data.catalogueLink}</a>
+        </div>
+        <ReleaseArticle
+          release={featuredRelease}
+          artist={artistsById.get(featuredRelease.data.artist)}
+          variant="home"
+          idPrefix="home"
+          listenLabel={homepage.data.listenLabel}
+          artistLabel="The artist"
+        />
+      </div>
+    </section>
+  )}
+
+  {featuredArtist && (
+    <section class="section" aria-labelledby="artists-heading" data-reveal>
+      <div class="wrap">
+        <div class="section__head">
+          <div>
+            <p class="section-index">{homepage.data.rosterIndex}</p>
+            <h2 id="artists-heading">{homepage.data.rosterHeading}</h2>
+          </div>
+          <a class="text-link" href="/artists.html">{homepage.data.rosterLink}</a>
+        </div>
+        <ArtistArticle artist={featuredArtist} releases={releases} variant="home" linkLabel={homepage.data.artistButton} />
+      </div>
+    </section>
+  )}
+
+  <section class="section" aria-labelledby="events-heading" data-reveal>
+    <div class="wrap">
+      <div class="section__head">
+        <div>
+          <p class="section-index">{homepage.data.liveIndex}</p>
+          <h2 id="events-heading">{homepage.data.liveHeading}</h2>
+        </div>
+        <a class="text-link" href="/events.html">{homepage.data.liveLink}</a>
+      </div>
+      {events.length > 0 ? (
+        <div class="event-list">
+          {events.map((event) => <EventArticle event={event} variant="home" />)}
+        </div>
+      ) : <p class="lede">No events announced.</p>}
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="radio-heading" data-reveal>
+    <div class="band__image" aria-hidden="true">
+      <SmartImage src={radio.data.image} alt="" sizes="100vw" required={false} />
+    </div>
+    <div class="band__content">
+      <p class="section-index">{homepage.data.radioIndex}</p>
+      <h2 id="radio-heading">{homepage.data.radioHeading}</h2>
+      <p class="lede">{radio.data.homeLede || radio.data.lede}</p>
+      <div class="button-row">
+        <a class="button" href="/radio.html">{homepage.data.radioButton}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="culture-heading" data-reveal>
+    <div class="wrap">
+      <div class="section__head">
+        <div>
+          <p class="section-index">{homepage.data.cultureIndex}</p>
+          <h2 id="culture-heading">{homepage.data.cultureHeading}</h2>
+        </div>
+        <a class="text-link" href="/culture.html">{homepage.data.cultureLink}</a>
+      </div>
+      {homeCulture.length > 0 ? (
+        <div class="editorial">
+          {homeCulture.map((article, index) => (
+            <CultureArticle article={article} variant={index === 0 ? "feature" : "teaser"} readLabel={homepage.data.readLabel} />
+          ))}
+        </div>
+      ) : <p class="lede">No pieces published.</p>}
+    </div>
+  </section>
+
+  <section class="section section--paper" aria-labelledby="enquire-heading" data-reveal>
+    <div class="wrap">
+      <p class="section-index">{homepage.data.contactIndex}</p>
+      <h2 id="enquire-heading">{homepage.data.contactHeading}</h2>
+      <p class="lede">{enquire.data.homeLede || enquire.data.lede}</p>
+      <div class="button-row">
+        <a class="button" href="/enquire.html">Enquire</a>
+        <a class="button button--ghost" href={`mailto:${settings.data.email}`}>{settings.data.email}</a>
+      </div>
+    </div>
+  </section>
+</Layout>

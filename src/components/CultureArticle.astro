@@ -1,0 +1,40 @@
+---
+import { render } from "astro:content";
+import type { CultureEntry } from "../lib/content";
+import { formatDate } from "../lib/text";
+import SmartImage from "./SmartImage.astro";
+import Share from "./Share.astro";
+
+interface Props {
+  article: CultureEntry;
+  variant: "feature" | "teaser" | "page";
+  readLabel?: string;
+}
+
+const { article, variant, readLabel = "Read" } = Astro.props;
+const { Content } = await render(article);
+const meta = article.data.date ? formatDate(article.data.date) : article.data.meta;
+const imageSizes = "(min-width: 52rem) 46rem, 100vw";
+---
+
+<article class:list={[{ "editorial__feature": variant === "feature" || (variant === "page" && article.data.image) }]} id={variant === "page" ? article.id : undefined}>
+  {variant === "feature" && article.data.image && (
+    <a class="media media--wide" href={`/culture.html#${article.id}`}>
+      <SmartImage src={article.data.image} alt={article.data.imageAlt || ""} sizes={imageSizes} required={false} />
+    </a>
+  )}
+  {variant === "page" && article.data.image && (
+    <div class="media media--wide">
+      <SmartImage src={article.data.image} alt={article.data.imageAlt || ""} sizes={imageSizes} required={false} />
+    </div>
+  )}
+  <div>
+    {article.data.flag && variant === "page" && <p class="flag">{article.data.flag}</p>}
+    {meta && <p class="meta">{meta}</p>}
+    {variant === "page" ? <h2>{article.data.title}</h2> : <h3>{article.data.title}</h3>}
+    {variant === "page" ? <Content /> : <p>{article.data.excerpt}</p>}
+    {variant !== "page" && <p><a class="text-link" href={`/culture.html#${article.id}`}>{readLabel}</a></p>}
+    {variant === "page" && article.data.release && <p><a class="text-link" href={`/releases.html#${article.data.release}`}>See the release</a></p>}
+    {variant === "page" && <Share path={`/culture/${article.id}.html`} title={`${article.data.title} — Sharp Records`} />}
+  </div>
+</article>

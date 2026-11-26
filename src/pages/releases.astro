@@ -1,0 +1,43 @@
+---
+import Layout from "../components/Layout.astro";
+import ReleaseArticle from "../components/ReleaseArticle.astro";
+import { getSite } from "../lib/content";
+import { organization, albumSchema } from "../lib/schema";
+import { shareImage } from "../lib/images";
+
+const site = await getSite();
+const page = site.sections.releases;
+const albums = await Promise.all(site.releases.map(async (release) => albumSchema(release, site.artistsById.get(release.data.artist), await shareImage(release.data.cover))));
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    organization({
+      email: site.settings.data.email,
+      city: site.settings.data.city,
+      country: site.settings.data.country,
+      countryCode: site.settings.data.countryCode,
+      genres: site.genres,
+      description: site.homepage.data.seoDescription,
+      sameAs: site.settings.data.social.map((item) => item.url),
+    }),
+    ...albums,
+  ],
+};
+---
+
+<Layout title={`${page.data.title} | Sharp Records`} description={page.data.description} jsonLd={jsonLd}>
+  <header class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">{page.data.eyebrow}</p>
+      <h1>{page.data.title}</h1>
+      <p class="lede">{page.data.lede}</p>
+    </div>
+  </header>
+  <section class="section">
+    <div class="wrap">
+      {site.releases.length > 0 ? site.releases.map((release) => (
+        <ReleaseArticle release={release} artist={site.artistsById.get(release.data.artist)} variant="catalogue" idPrefix="releases" />
+      )) : <p class="lede">No releases published.</p>}
+    </div>
+  </section>
+</Layout>

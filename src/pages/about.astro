@@ -1,0 +1,39 @@
+---
+import { render } from "astro:content";
+import Layout from "../components/Layout.astro";
+import SmartImage from "../components/SmartImage.astro";
+import { getSite } from "../lib/content";
+import { lines } from "../lib/text";
+import { organization } from "../lib/schema";
+
+const site = await getSite();
+const { about } = site;
+const { Content } = await render(about);
+---
+
+<Layout title={`${about.data.title} | Sharp Records`} description={about.data.description} jsonLd={{ "@context": "https://schema.org", "@graph": [organization({ email: site.settings.data.email, city: site.settings.data.city, country: site.settings.data.country, countryCode: site.settings.data.countryCode, genres: site.genres, description: about.data.description })] }}>
+  <header class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">{about.data.eyebrow}</p>
+      <h1>{about.data.title}</h1>
+      <p class="lede">{about.data.lede}</p>
+    </div>
+  </header>
+  <section class="section section--paper" aria-labelledby="manifesto-heading">
+    <div class="wrap">
+      <div class="media media--wide events-hero-media">
+        <SmartImage src={about.data.image} alt={about.data.imageAlt} sizes="(min-width: 52rem) 68rem, 100vw" loading="eager" />
+      </div>
+      <h2 id="manifesto-heading" class="manifesto__open">{about.data.heading}</h2>
+      <div class="manifesto__body"><Content /></div>
+      <p class="manifesto__close">
+        {lines(about.data.closing).map((line, index) => (
+          <>
+            {index > 0 && <br />}
+            {line}
+          </>
+        ))}
+      </p>
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,23 @@
+---
+import { render } from "astro:content";
+import Layout from "../components/Layout.astro";
+import { getSite } from "../lib/content";
+
+const { privacy } = await getSite();
+const { Content } = await render(privacy);
+---
+
+<Layout title={`${privacy.data.title} | Sharp Records`} description={privacy.data.description}>
+  <header class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">Legal</p>
+      <h1>{privacy.data.title}</h1>
+      {!privacy.data.reviewed && <p class="template-banner">Template for review. This privacy page is a draft. Square brackets mark details only Corby can confirm. It is not legal advice.</p>}
+    </div>
+  </header>
+  <section class="section">
+    <div class="wrap prose privacy">
+      <Content />
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,44 @@
+---
+import { getCollection, getEntry, render } from "astro:content";
+import Layout from "../../components/Layout.astro";
+import SmartImage from "../../components/SmartImage.astro";
+import Share from "../../components/Share.astro";
+import { getSite } from "../../lib/content";
+import { formatDate } from "../../lib/text";
+import { organization, articleSchema } from "../../lib/schema";
+import { shareImage } from "../../lib/images";
+
+export async function getStaticPaths() {
+  const articles = await getCollection("culture");
+  return articles.map((article) => ({ params: { slug: article.id } }));
+}
+
+const article = await getEntry("culture", Astro.params.slug!);
+if (!article) throw new Error("Missing article");
+const site = await getSite();
+const { Content } = await render(article);
+const image = article.data.image ? await shareImage(article.data.image) : undefined;
+const meta = article.data.date ? formatDate(article.data.date) : article.data.meta;
+---
+
+<Layout title={`${article.data.title} | Sharp Records`} description={article.data.excerpt} ogImage={image} ogType="article" jsonLd={{ "@context": "https://schema.org", "@graph": [organization({ email: site.settings.data.email, city: site.settings.data.city, country: site.settings.data.country, countryCode: site.settings.data.countryCode, genres: site.genres, description: site.homepage.data.seoDescription }), articleSchema({ id: article.id, title: article.data.title, description: article.data.excerpt, date: article.data.date, image })] }}>
+  <header class="page-hero">
+    <div class="wrap">
+      {article.data.flag && <p class="flag">{article.data.flag}</p>}
+      {meta && <p class="eyebrow">{meta}</p>}
+      <h1>{article.data.title}</h1>
+    </div>
+  </header>
+  <section class="section">
+    <div class="wrap">
+      {article.data.image && (
+        <div class="media media--wide events-hero-media">
+          <SmartImage src={article.data.image} alt={article.data.imageAlt || ""} sizes="(min-width: 52rem) 46rem, 100vw" loading="eager" required={false} />
+        </div>
+      )}
+      <Content />
+      {article.data.release && <p><a class="text-link" href={`/releases.html#${article.data.release}`}>See the release</a></p>}
+      <Share path={`/culture/${article.id}.html`} title={`${article.data.title} — Sharp Records`} />
+    </div>
+  </section>
+</Layout>

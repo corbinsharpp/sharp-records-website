@@ -1,0 +1,36 @@
+---
+import { render } from "astro:content";
+import type { EventEntry } from "../lib/content";
+import { formatDate } from "../lib/text";
+import Share from "./Share.astro";
+
+interface Props {
+  event: EventEntry;
+  variant: "home" | "page";
+}
+
+const { event, variant } = Astro.props;
+const { Content } = await render(event);
+const title = variant === "home" ? event.data.shortTitle || event.data.title : event.data.title;
+const ticket = event.data.ticketUrl;
+---
+
+<article class="event" id={variant === "page" ? event.id : undefined}>
+  <p class="event__date">{formatDate(event.data.start)}</p>
+  <div>
+    {variant === "home" ? <h3>{title}</h3> : <h2>{title}</h2>}
+    {variant === "home" ? <p>{event.data.home || event.body}</p> : <Content />}
+    {variant === "page" && (
+      <p class="meta">
+        {event.data.city} · {event.data.venue}
+        {event.data.placeholder && <> · <span class="flag">Placeholder</span></>}
+      </p>
+    )}
+    {variant === "page" && <Share path={`/events/${event.id}.html`} title={`${event.data.title} — Sharp Records`} />}
+  </div>
+  <p class="event__note">
+    {variant === "home" && <a href={`/events.html#${event.id}`}>Details</a>}
+    {variant === "page" && ticket && <a href={ticket}>Tickets</a>}
+    {variant === "page" && !ticket && "Details forthcoming"}
+  </p>
+</article>

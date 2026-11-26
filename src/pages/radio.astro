@@ -1,0 +1,54 @@
+---
+import { render } from "astro:content";
+import Layout from "../components/Layout.astro";
+import SmartImage from "../components/SmartImage.astro";
+import Embeds from "../components/Embeds.astro";
+import { getSite } from "../lib/content";
+import { formatDate } from "../lib/text";
+import { organization } from "../lib/schema";
+
+const site = await getSite();
+const page = site.sections.radio;
+const { Content } = await render(page);
+---
+
+<Layout title={`${page.data.title} | Sharp Records`} description={page.data.description} jsonLd={{ "@context": "https://schema.org", "@graph": [organization({ email: site.settings.data.email, city: site.settings.data.city, country: site.settings.data.country, countryCode: site.settings.data.countryCode, genres: site.genres, description: site.homepage.data.seoDescription })] }}>
+  <header class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">{page.data.eyebrow}</p>
+      <h1>{page.data.title}</h1>
+      <p class="lede">{page.data.lede}</p>
+    </div>
+  </header>
+  <section class="section">
+    <div class="wrap">
+      {page.data.image && (
+        <div class="media media--wide events-hero-media">
+          <SmartImage src={page.data.image} alt={page.data.imageAlt || ""} sizes="(min-width: 52rem) 72rem, 100vw" loading="eager" required={false} />
+        </div>
+      )}
+      {site.radio.length === 0 ? (
+        <>
+          {page.data.noteFlag && <p class="flag">{page.data.noteFlag}</p>}
+          {page.data.noteHeading && <h2>{page.data.noteHeading}</h2>}
+          <div class="prose"><Content /></div>
+        </>
+      ) : (
+        <div class="event-list">
+          {site.radio.map((episode) => (
+            <article class="event" id={episode.id}>
+              <p class="event__date">{episode.data.date ? formatDate(episode.data.date) : "Radio"}</p>
+              <div>
+                <h2><a href={`/radio/${episode.id}.html`}>{episode.data.title}</a></h2>
+                {episode.body && <p>{episode.body.split("\n").find((line) => line.trim())}</p>}
+                {episode.data.audio && <audio class="mix" controls preload="none" src={episode.data.audio}><a href={episode.data.audio}>Listen</a></audio>}
+                <Embeds bandcamp={episode.data.bandcamp} soundcloud={episode.data.soundcloud} spotify={episode.data.spotify} mixcloud={episode.data.mixcloud} youtube={episode.data.youtube} />
+              </div>
+              <p class="event__note"><a href={`/radio/${episode.id}.html`}>Listen</a></p>
+            </article>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</Layout>

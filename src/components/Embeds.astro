@@ -1,0 +1,26 @@
+---
+import { embedsFrom } from "../lib/embeds";
+
+interface Props {
+  bandcamp?: string;
+  soundcloud?: string;
+  spotify?: string;
+  mixcloud?: string;
+  youtube?: string;
+}
+
+const items = embedsFrom(Astro.props);
+---
+
+{
+  items.length > 0 && (
+    <div class="embeds">
+      {items.map((item) => (
+        <div class="embed">
+          {item.src && <iframe src={item.src} title={item.title} loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" />}
+          <p><a href={item.href} target="_blank" rel="noopener noreferrer">Listen on {item.label}<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+        </div>
+      ))}
+    </div>
+  )
+}

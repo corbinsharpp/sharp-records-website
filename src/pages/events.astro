@@ -1,0 +1,41 @@
+---
+import Layout from "../components/Layout.astro";
+import EventArticle from "../components/EventArticle.astro";
+import SmartImage from "../components/SmartImage.astro";
+import { getSite } from "../lib/content";
+import { organization, eventSchema } from "../lib/schema";
+
+const site = await getSite();
+const page = site.sections.events;
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    organization({ email: site.settings.data.email, city: site.settings.data.city, country: site.settings.data.country, countryCode: site.settings.data.countryCode, genres: site.genres, description: site.homepage.data.seoDescription }),
+    ...site.events.map((event) => eventSchema(event, event.data.performer ? site.artistsById.get(event.data.performer) : undefined)),
+  ],
+};
+---
+
+<Layout title={`${page.data.title} | Sharp Records`} description={page.data.description} jsonLd={jsonLd}>
+  <header class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">{page.data.eyebrow}</p>
+      <h1>{page.data.title}</h1>
+      <p class="lede">{page.data.lede}</p>
+    </div>
+  </header>
+  <section class="section">
+    <div class="wrap">
+      {page.data.image && (
+        <div class="media media--wide events-hero-media">
+          <SmartImage src={page.data.image} alt={page.data.imageAlt || ""} sizes="(min-width: 52rem) 72rem, 100vw" loading="eager" required={false} />
+        </div>
+      )}
+      {site.events.length > 0 ? (
+        <div class="event-list">
+          {site.events.map((event) => <EventArticle event={event} variant="page" />)}
+        </div>
+      ) : <p class="lede">No events announced.</p>}
+    </div>
+  </section>
+</Layout>

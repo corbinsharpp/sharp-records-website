@@ -1,0 +1,60 @@
+---
+import { readPeaks } from "../lib/peaks";
+import { publicPath, slugify } from "../lib/text";
+
+interface Track {
+  title: string;
+  previewMp3?: string;
+  previewM4a?: string;
+  previewOgg?: string;
+  peaks?: string;
+}
+
+interface Props {
+  tracks: Track[];
+  idPrefix: string;
+}
+
+const { tracks, idPrefix } = Astro.props;
+const playable = tracks.some((track) => track.previewMp3 || track.previewM4a || track.previewOgg);
+
+function sources(track: Track) {
+  return [
+    track.previewM4a ? { src: publicPath(track.previewM4a), type: "audio/mp4" } : null,
+    track.previewMp3 ? { src: publicPath(track.previewMp3), type: "audio/mpeg" } : null,
+    track.previewOgg ? { src: publicPath(track.previewOgg), type: "audio/ogg" } : null,
+  ].filter((item): item is { src: string; type: string } => Boolean(item));
+}
+---
+
+<ol class:list={["tracklist", { "tracklist--playable": playable }]}>
+  {
+    tracks.map((track, index) => {
+      const audio = sources(track);
+      const peaks = readPeaks(track.peaks);
+      const audioId = `audio-${idPrefix}-${slugify(track.title)}`;
+      return (
+        <li>
+          <div class="track">
+            <span class="track__index">{String(index + 1).padStart(2, "0")}</span>
+            <span class="track__title">{track.title}</span>
+            {audio.length > 0 && (
+              <div class="preview" data-preview data-track-title={track.title} data-peaks={peaks ? JSON.stringify(peaks) : undefined}>
+                <button type="button" class="preview__btn" data-preview-btn aria-pressed="false" aria-controls={audioId} aria-label={`Play preview of ${track.title}`} hidden>
+                  <svg class="preview__icon preview__icon--play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 4.5v15l12-7.5z" /></svg>
+                  <svg class="preview__icon preview__icon--pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 5h4v14H6zm8 0h4v14h-4z" /></svg>
+                </button>
+                <span class="preview__disc" aria-hidden="true"><img src="/assets/img/logo-vinyl.svg" alt="" width="24" height="24" loading="lazy" decoding="async" /></span>
+                <div class="preview__wave" data-preview-wave hidden />
+                <audio id={audioId} class="preview__native" data-preview-audio preload="none" controls>
+                  {audio.map((source) => <source src={source.src} type={source.type} />)}
+                </audio>
+                <span class="preview__time" data-preview-time hidden>0:00 / 0:15</span>
+              </div>
+            )}
+          </div>
+        </li>
+      );
+    })
+  }
+</ol>

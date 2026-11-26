@@ -5,3 +5,9 @@ blob-report
 playwright/.cache
 ._*
 .DS_Store
+dist
+.astro
+.env
+.env.*
+!.env.example
+public/admin/decap-cms.js

@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 
-OUT = Path(__file__).resolve().parents[1] / "assets" / "img"
+OUT = Path(__file__).resolve().parents[1] / "public" / "assets" / "img"
 OUT.mkdir(parents=True, exist_ok=True)
 
 BLACK = (13, 13, 13)

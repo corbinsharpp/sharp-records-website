@@ -1,0 +1,59 @@
+---
+import Header from "./Header.astro";
+import Footer from "./Footer.astro";
+import CookieBanner from "./CookieBanner.astro";
+import JsonLd from "./JsonLd.astro";
+import { absolute, analyticsId } from "../lib/site";
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  ogType?: string;
+  jsonLd?: unknown;
+}
+
+const { title, description, ogImage = absolute("/assets/img/og-image.png"), ogType = "website", jsonLd } = Astro.props;
+const canonical = absolute(Astro.url.pathname);
+const ga = analyticsId();
+---
+
+<!DOCTYPE html>
+<html lang="en-GB" data-ga={ga || undefined}>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{title}</title>
+  <meta name="description" content={description}>
+  <meta name="theme-color" content="#0D0D0D">
+  <link rel="canonical" href={canonical}>
+  <meta property="og:type" content={ogType}>
+  <meta property="og:site_name" content="Sharp Records">
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={description}>
+  <meta property="og:url" content={canonical}>
+  <meta property="og:image" content={ogImage}>
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content={title}>
+  <meta name="twitter:description" content={description}>
+  <meta name="twitter:image" content={ogImage}>
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/img/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png" sizes="180x180">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="/assets/fonts/oswald.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/styles.css?v=20261126">
+  {jsonLd && <JsonLd data={jsonLd} />}
+</head>
+<body>
+  <Header />
+  <main id="main">
+    <slot />
+  </main>
+  <Footer />
+  <CookieBanner />
+  <script type="module" src="/assets/js/main.js?v=20261126"></script>
+</body>
+</html>
