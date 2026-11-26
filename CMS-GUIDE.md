@@ -1,3 +1,23 @@
+# Will I have to pay to run it?
+
+No. The website, the dashboard, the enquiry form, the spam check, analytics and the newsletter all stay on free plans. You do not need a credit card to set them up. Do not enter a card when a site offers a trial: pick the free plan. Nothing here bills you unless you later click an upgrade yourself.
+
+The only expected cost is the domain name **sharprecords.co.uk**. That is the yearly fee charged by the company you registered it with. Attaching the domain to the site is free.
+
+| Service | What it does | Cost now | Free allowance | What would start a charge |
+| --- | --- | --- | --- | --- |
+| Domain name | The address sharprecords.co.uk | The only expected cost | Connecting it to Cloudflare is free | The registrar’s renewal. Cloudflare does not charge for the connection. |
+| Cloudflare Pages | Hosts the site | Free | Unlimited visits and bandwidth. 500 rebuilds a month. Up to 100 domains on the project. | More than 500 rebuilds in a month, which needs a paid Cloudflare plan. Publishing a few times a week stays inside the free allowance. |
+| Cloudflare Workers (the small form and sign-in programs) | Sends enquiries, newsletter sign-ups and dashboard login | Free | 100,000 of these requests a day. Ordinary page views do not count. | More than 100,000 of those requests in one day. The paid Workers plan is $5 a month. A label site does not get near this. |
+| Decap CMS | The dashboard at /admin | Free | No fee and no per-person charge. It is open source. | Nothing. There is no paid Decap plan to fall into. |
+| GitHub | Stores the pages the dashboard saves | Free | A personal account, including a private repository. | GitHub Team or Enterprise. This site does not need either. |
+| Cloudflare Turnstile | The “I am a person” check on forms | Free | Unlimited checks. Up to 20 widgets. | An Enterprise contract, sold to large companies. Not needed. |
+| Formspree | Emails you each enquiry | Free | 50 enquiries a month. The dashboard keeps 30 days of them. | Enquiry 51 in a calendar month. Formspree stops emailing the extras until next month. A paid plan starts at $10 a month (billed yearly) or $15 a month. You are only charged if you upgrade. |
+| Buttondown | The newsletter list | Free | The first 100 people who are actually receiving the email. Their price assumes at most one email a day to the whole list. | Subscriber 101. Their pricing page then shows $9 a month, up to 1,000 people. Extras such as tagging or their own analytics are optional paid add-ons. Leave them off. |
+| Google Analytics | Visitor counts, only after someone presses Accept | Free | A normal GA4 property. Standard reports stay available. The finer “Explorations” reports keep detail for 2 or 14 months, which you choose. | Google Analytics 360, an enterprise product. Leave the measurement ID blank and analytics stays off and costs nothing. |
+
+Prices above were taken from each company’s own pricing page in November 2026. Check the page again before you upgrade anything. You can run the label site for years without paying any of them.
+
 # What only you can do
 
 These accounts and keys cannot be invented for you. The site already runs without them. The enquiry form and the newsletter stay switched off, and show the email address instead, until the keys below are pasted in. Analytics stays off until you add a measurement ID. The dashboard on your own computer works before any of this.

@@ -50,8 +50,10 @@ npm test
 - `public/admin` — the dashboard
 - `functions/api` — enquiry form, newsletter, and GitHub sign-in (Cloudflare Pages)
 
-## Hosting
+## Hosting and cost
 
 Cloudflare Pages. Build command `npm run build`, output directory `dist`. The `functions` folder is deployed with the site. Custom domain steps, analytics, Turnstile, Formspree and Buttondown are in `CMS-GUIDE.md`.
+
+Every service is on a free tier. The domain name is the only expected cost. The allowance for each service, and the point at which a paid plan would start, is the table at the top of `CMS-GUIDE.md`.
 
 Environment variables are listed in `.env.example`. None of them are required for the pages to build.
