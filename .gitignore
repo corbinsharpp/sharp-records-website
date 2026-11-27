@@ -11,3 +11,4 @@ dist
 .env.*
 !.env.example
 public/admin/decap-cms.js
+public/admin/decap-config.yml

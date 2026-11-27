@@ -1,3 +1,5 @@
+import { authOrigin } from "../_lib/origin.js";
+
 function page(message) {
   const html = `<!DOCTYPE html>
 <html lang="en-GB">
@@ -43,7 +45,7 @@ export async function onRequest({ request, env }) {
       client_id: env.GITHUB_CLIENT_ID,
       client_secret: env.GITHUB_CLIENT_SECRET,
       code,
-      redirect_uri: new URL("/api/callback", request.url).toString(),
+      redirect_uri: `${authOrigin(request, env)}/api/callback`,
     }),
   });
   const data = await response.json().catch(() => ({}));

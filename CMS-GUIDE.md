@@ -33,7 +33,7 @@ Do these in order.
    - Framework preset: None
    - Build command: `npm run build`
    - Build output directory: `dist`
-5. Press **Save and Deploy**. The first address will look like `sharp-records.pages.dev`. The dashboard at `/admin` on that address will not sign in until step 3, because GitHub only allows one callback address and yours should be the real domain.
+5. Press **Save and Deploy**. The production address is https://sharp-records-website.pages.dev. You can sign in at `/admin` on that address as soon as the GitHub app in step 3 is saved. The real domain is step 2 and does not have to be connected first.
 
 ## 2. Connect sharprecords.uk
 
@@ -52,18 +52,31 @@ The live address is the apex, **https://sharprecords.uk**, with no www. The dash
 
 ## 3. Let the dashboard sign in with GitHub
 
+GitHub allows one callback address on an OAuth app. Use the address you are opening the dashboard on. The site fills that address in itself, so you do not change the code when you move from the Pages address to the real domain. You only update this GitHub app.
+
+**To test now**, before sharprecords.uk is connected:
+
 1. On GitHub, open **Settings** (your user settings, not the repository) → **Developer settings** → **OAuth Apps** → **New OAuth App**.
 2. Fill in:
    - Application name: `Sharp Records site`
-   - Homepage URL: `https://sharprecords.uk`
-   - Authorization callback URL: `https://sharprecords.uk/api/callback`
+   - Homepage URL: `https://sharp-records-website.pages.dev`
+   - Authorization callback URL: `https://sharp-records-website.pages.dev/api/callback`
 3. Press **Register application**. Copy the **Client ID**.
 4. Press **Generate a new client secret**. Copy the secret straight away. GitHub will not show it again.
-5. In Cloudflare Pages → your project → **Settings** → **Variables and Secrets**, add:
-   - `GITHUB_CLIENT_ID` = the Client ID
-   - `GITHUB_CLIENT_SECRET` = the secret (mark this one as a secret / encrypted)
-6. Press **Save**, then **Deployments** → **Retry deployment** on the latest build so the new values are used.
-7. Open https://sharprecords.uk/admin and press **Login with GitHub**. Use the GitHub account that owns the repository.
+5. In Cloudflare Pages → **sharp-records-website** → **Settings** → **Environment variables**. Open the **Production** section (the address `sharp-records-website.pages.dev` uses Production, not Preview). Add:
+   - `GITHUB_CLIENT_ID` = the Client ID (plain variable)
+   - `GITHUB_CLIENT_SECRET` = the secret (type **Secret** / encrypted)
+6. Do not add `SITE_AUTH_ORIGIN`. Left blank, login uses the address in the browser.
+7. Press **Save**. Open https://sharp-records-website.pages.dev/admin and press **Login with GitHub**. Use the GitHub account that owns the repository.
+
+**When sharprecords.uk is connected**, edit the same GitHub OAuth app (do not create a second one unless you want both addresses to work at once):
+
+- Homepage URL: `https://sharprecords.uk`
+- Authorization callback URL: `https://sharprecords.uk/api/callback`
+
+Save the GitHub app. No Cloudflare secret changes and no new code. Then open https://sharprecords.uk/admin. The old pages.dev callback stops working until you change the GitHub app back, because one app has one callback.
+
+Saves from the dashboard go onto the branch Cloudflare is publishing, currently `cursor/cms-dashboard-784c`. When the live site is built from `main` instead, add a Production variable `CMS_BRANCH` with the value `main`. Until you set that, leave `CMS_BRANCH` empty.
 
 ## 4. Enquiry form: spam check and delivery
 

@@ -8,7 +8,7 @@
     "build": "astro build",
     "preview": "astro preview --host 127.0.0.1 --port 4173",
     "cms": "MODE=git decap-server",
-    "test": "astro build && playwright test && node --test tests/validate.test.js",
+    "test": "astro build && playwright test && node --test tests/*.test.js",
     "serve": "python3 -m http.server 4173 --bind 127.0.0.1 --directory dist"
   },
   "devDependencies": {

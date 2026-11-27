@@ -1,9 +1,11 @@
+import { authOrigin } from "../_lib/origin.js";
+
 export async function onRequest({ request, env }) {
   if (!env.GITHUB_CLIENT_ID) {
     return new Response("GitHub sign-in is not set up yet. Add GITHUB_CLIENT_ID in the hosting settings.", { status: 503 });
   }
   const state = crypto.randomUUID();
-  const redirectUri = new URL("/api/callback", request.url).toString();
+  const redirectUri = `${authOrigin(request, env)}/api/callback`;
   const url = new URL("https://github.com/login/oauth/authorize");
   url.searchParams.set("client_id", env.GITHUB_CLIENT_ID);
   url.searchParams.set("redirect_uri", redirectUri);

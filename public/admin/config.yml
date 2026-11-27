@@ -1,4 +1,7 @@
 # Sharp Records dashboard.
+# On Cloudflare, /admin/config.yml is generated per request from this file.
+# base_url follows the address in the browser unless SITE_AUTH_ORIGIN is set.
+# branch follows CMS_BRANCH, otherwise the branch named below.
 # Corby edits this site at /admin. Drafts stay off the website until he presses Publish.
 # Images land in src/assets/uploads. Short audio previews land in public/assets/audio.
 
@@ -8,12 +11,12 @@ publish_mode: editorial_workflow
 backend:
   name: github
   repo: corbinsharpp/sharp-records-website
-  branch: main
-  base_url: https://sharprecords.uk
+  branch: "cursor/cms-dashboard-784c"
+  base_url: https://sharp-records-website.pages.dev
   auth_endpoint: api/auth
 
-site_url: https://sharprecords.uk
-display_url: https://sharprecords.uk
+site_url: https://sharp-records-website.pages.dev
+display_url: https://sharp-records-website.pages.dev
 show_preview_links: true
 logo_url: /assets/img/logo-vinyl.svg
 
