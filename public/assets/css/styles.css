@@ -1,0 +1,1396 @@
+/* Sharp Records — editorial black-and-white system.
+   Display: Oswald. Body: Inter. Details: IBM Plex Mono.
+   Colour is near-black, off-white and grey; signal red is used only as a motif. */
+
+:root {
+  --color-bg: #0d0d0d;
+  --color-fg: #f2f0ea;
+  --color-muted: #8a8d91;
+  --color-ink-muted: #3d3f42;
+  --color-faint: #2a2a2a;
+  --color-line: rgba(242, 240, 234, 0.14);
+  --color-line-strong: rgba(242, 240, 234, 0.28);
+  --color-surface: #141414;
+  --color-accent: #ff3b30;
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-display: Oswald, Impact, "Arial Narrow", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --space-2xs: 0.35rem;
+  --space-xs: 0.65rem;
+  --space-sm: 1rem;
+  --space-md: 1.75rem;
+  --space-lg: 3rem;
+  --space-xl: 5.5rem;
+  --space-2xl: 8.5rem;
+  --gutter: clamp(1.1rem, 4vw, 2.75rem);
+  --wrap: min(78rem, calc(100% - 2 * var(--gutter)));
+  --wrap-narrow: min(42rem, calc(100% - 2 * var(--gutter)));
+  --step--1: clamp(0.78rem, 0.74rem + 0.18vw, 0.88rem);
+  --step-0: clamp(1rem, 0.96rem + 0.22vw, 1.125rem);
+  --step-1: clamp(1.2rem, 1.05rem + 0.7vw, 1.55rem);
+  --step-2: clamp(1.85rem, 1.2rem + 2.1vw, 3.1rem);
+  --step-3: clamp(2.6rem, 1.4rem + 4vw, 5.2rem);
+  --step-4: clamp(3.4rem, 1.5rem + 7vw, 8.4rem);
+  --focus: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-fg);
+}
+
+@font-face {
+  font-family: Inter;
+  src: url("../fonts/inter.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Oswald;
+  src: url("../fonts/oswald.woff2") format("woff2");
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("../fonts/ibm-plex-mono.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-size: 100%;
+  line-height: 1.65;
+  hanging-punctuation: first last;
+  interpolate-size: allow-keywords;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  position: relative;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+a {
+  color: inherit;
+  text-underline-offset: 0.18em;
+}
+
+a:hover { color: var(--color-fg); }
+
+:focus { outline: none; }
+:focus-visible { box-shadow: var(--focus); outline: none; }
+
+.skip-link {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: var(--gutter);
+  transform: translateY(-120%);
+  z-index: 100;
+  padding: 0.6rem 0.9rem;
+  background: var(--color-fg);
+  color: var(--color-bg);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0.75rem);
+  box-shadow: var(--focus);
+}
+
+.wrap {
+  width: var(--wrap);
+  margin-inline: auto;
+}
+
+/* Film grain + faint scratches sit above the page but never steal clicks. */
+body::before,
+body::after {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+}
+
+body::before {
+  opacity: 0.075;
+  background-image: url("../img/grain-tile.png");
+  background-size: 180px 180px;
+  mix-blend-mode: overlay;
+}
+
+body::after {
+  opacity: 0.045;
+  background-image: url("../img/texture-scratch.svg");
+  background-size: 900px auto;
+  mix-blend-mode: screen;
+}
+
+/* Header */
+.site-header {
+  border-block-end: 1px solid var(--color-line);
+  background: color-mix(in srgb, var(--color-bg) 82%, transparent);
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 20;
+  backdrop-filter: blur(14px);
+}
+
+.site-header__inner {
+  width: var(--wrap);
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding-block: 0.75rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  flex-shrink: 0;
+}
+
+.logo img {
+  width: 2.6rem;
+  height: 2.6rem;
+  flex-shrink: 0;
+}
+
+.nav-toggle {
+  display: none;
+  appearance: none;
+  background: transparent;
+  color: var(--color-fg);
+  border: 1px solid var(--color-fg);
+  padding: 0.4rem 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.site-nav__list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.15rem 1.15rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-nav a {
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current="page"] { color: var(--color-fg); }
+
+.site-nav a[aria-current="page"] {
+  box-shadow: inset 0 -2px 0 var(--color-fg);
+}
+
+@media (max-width: 70rem) {
+  .nav-toggle { display: inline-flex; }
+  .site-nav__list {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.9rem;
+    padding-block: 0.6rem 1.1rem;
+  }
+  .site-nav[data-enhanced] .site-nav__list { display: none; }
+  .site-nav[data-enhanced].is-open .site-nav__list { display: flex; }
+  .site-header__inner { flex-wrap: wrap; }
+  .site-nav { flex-basis: 100%; }
+}
+
+/* Type */
+.eyebrow,
+.meta,
+.section-index {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--step-4); margin: 0 0 var(--space-md); }
+h2 { font-size: var(--step-2); margin: 0 0 var(--space-sm); }
+h3 { font-size: var(--step-1); margin: 0 0 var(--space-xs); }
+
+.lede {
+  font-size: var(--step-1);
+  max-inline-size: 38rem;
+  color: color-mix(in srgb, var(--color-fg) 88%, var(--color-muted));
+  text-wrap: pretty;
+}
+
+/* Buttons */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.35rem;
+  border: 1px solid var(--color-fg);
+  background: var(--color-fg);
+  color: var(--color-bg);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.button:hover { background: var(--color-bg); color: var(--color-fg); }
+
+.button--ghost {
+  background: transparent;
+  color: var(--color-fg);
+}
+
+.button--ghost:hover { background: var(--color-fg); color: var(--color-bg); }
+
+.button[disabled],
+.button[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-block-start: var(--space-md);
+}
+
+.text-link {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  border-block-end: 1px solid var(--color-line);
+  overflow: hidden;
+}
+
+.hero__frame {
+  width: var(--wrap);
+  margin-inline: auto;
+  padding-block: clamp(1.4rem, 2.4vw, 2.75rem) var(--space-sm);
+}
+
+.hero__mast {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  margin: 0 0 var(--space-sm);
+  padding-block-end: 0.7rem;
+  border-block-end: 1px solid var(--color-line);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.hero__grid {
+  display: grid;
+  gap: var(--space-md);
+  align-items: end;
+}
+
+@media (min-width: 58rem) {
+  .hero__grid { grid-template-columns: 1.15fr 0.85fr; align-items: center; }
+}
+
+.hero__kicker {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin: 0 0 var(--space-sm);
+}
+
+.hero__statement {
+  display: grid;
+  gap: 0.12em;
+  margin: 0;
+  font-size: clamp(2.4rem, 1.1rem + 5.6vw, 6.35rem);
+  letter-spacing: -0.02em;
+  line-height: 0.86;
+}
+
+.hero__statement span { display: block; }
+
+.hero__mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.hero__mark img {
+  width: min(100%, 34rem);
+  height: auto;
+  grid-area: 1 / 1;
+}
+
+.hero__vinyl {
+  animation: vinyl-spin 90s linear infinite;
+  /* Disc rim ends just inside 36.5% of the 2000 canvas, so the plate stays outside the spin. */
+  clip-path: circle(36.55% at 50% 50%);
+}
+
+.hero__accent {
+  position: absolute;
+  width: 0.7rem;
+  height: 0.7rem;
+  background: var(--color-accent);
+  inset-block-start: 8%;
+  inset-inline-end: 12%;
+}
+
+@keyframes vinyl-spin {
+  to { transform: rotate(360deg); }
+}
+
+.ticker {
+  overflow: hidden;
+  border-block-start: 1px solid var(--color-line);
+  padding-block: 0.7rem;
+}
+
+.ticker__track {
+  display: flex;
+  gap: 0;
+  width: max-content;
+  animation: ticker 42s linear infinite;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.ticker__track span {
+  padding-inline: 1.25rem;
+  white-space: nowrap;
+}
+
+.ticker__track span::after {
+  content: "／";
+  margin-inline-start: 1.25rem;
+  opacity: 0.5;
+}
+
+@keyframes ticker {
+  to { transform: translateX(-50%); }
+}
+
+/* Sections */
+.section {
+  padding-block: var(--space-xl);
+  border-block-end: 1px solid var(--color-line);
+  position: relative;
+}
+
+.section__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: end;
+  gap: var(--space-sm);
+  margin-block-end: var(--space-md);
+}
+
+.section-index { margin: 0 0 var(--space-md); }
+
+.section--paper {
+  background: var(--color-fg);
+  color: var(--color-bg);
+}
+
+.section--paper a:hover { color: var(--color-bg); }
+
+.section--paper .eyebrow,
+.section--paper .meta,
+.section--paper .section-index,
+.section--paper .lede {
+  color: var(--color-ink-muted);
+}
+
+.section--paper .button {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  border-color: var(--color-bg);
+}
+
+.section--paper .button:hover {
+  background: transparent;
+  color: var(--color-bg);
+}
+
+.section--paper .button--ghost {
+  background: transparent;
+  color: var(--color-bg);
+  border-color: var(--color-bg);
+}
+
+.section--paper .button--ghost:hover {
+  background: var(--color-bg);
+  color: var(--color-fg);
+}
+
+.section--paper :focus-visible {
+  box-shadow: 0 0 0 2px var(--color-fg), 0 0 0 4px var(--color-bg);
+}
+
+.page-hero {
+  padding-block: var(--space-xl) var(--space-lg);
+  border-block-end: 1px solid var(--color-line);
+}
+
+.page-hero h1 {
+  font-size: clamp(3.2rem, 1.4rem + 10vw, 9.5rem);
+  letter-spacing: -0.03em;
+  line-height: 0.8;
+  margin-block-end: var(--space-sm);
+}
+
+/* Manifesto */
+.manifesto__open {
+  font-size: clamp(2.1rem, 1.2rem + 3.4vw, 4.4rem);
+  max-inline-size: 18ch;
+  margin-block-end: var(--space-lg);
+}
+
+.manifesto__body {
+  display: grid;
+  gap: 1.15rem;
+  max-inline-size: 40rem;
+  font-size: var(--step-0);
+}
+
+.manifesto__body p { margin: 0; }
+
+.manifesto__close {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 0.95;
+  margin: var(--space-lg) 0 var(--space-md);
+}
+
+/* Release / feature */
+.release {
+  display: grid;
+  gap: var(--space-lg);
+  align-items: center;
+}
+
+@media (min-width: 52rem) {
+  .release { grid-template-columns: 0.95fr 1.05fr; }
+}
+
+.release__art { position: relative; }
+
+.release__art img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.release__cat {
+  position: absolute;
+  inset-inline-end: -0.15em;
+  inset-block-end: -0.28em;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 2rem + 8vw, 9rem);
+  line-height: 0.7;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: var(--color-fg);
+  opacity: 0.14;
+  pointer-events: none;
+}
+
+.tracklist {
+  list-style: none;
+  margin: var(--space-sm) 0 0;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+}
+
+.tracklist li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.6rem;
+  border-block-end: 1px solid var(--color-line);
+}
+
+.section--paper .tracklist li { border-color: rgba(13, 13, 13, 0.14); }
+
+.tracklist--playable > li {
+  display: block;
+}
+
+.track {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(6.5rem, auto) minmax(10.5rem, 1fr);
+  align-items: center;
+  gap: 0.5rem 0.85rem;
+}
+
+@media (max-width: 36rem) {
+  .track {
+    grid-template-columns: 1.75rem 1fr;
+  }
+
+  .track .preview {
+    grid-column: 1 / -1;
+  }
+}
+
+.track__index,
+.track__title {
+  font-family: var(--font-mono);
+}
+
+.track__title {
+  min-width: 0;
+}
+
+/* Artist */
+.artist {
+  display: grid;
+  gap: var(--space-lg);
+  align-items: stretch;
+}
+
+@media (min-width: 52rem) {
+  .artist { grid-template-columns: 0.8fr 1.2fr; }
+}
+
+.artist__visual img {
+  width: 100%;
+  height: 100%;
+  max-height: 36rem;
+  object-fit: cover;
+  aspect-ratio: 3 / 4;
+}
+
+/* Events list */
+.event-list { display: grid; gap: 0; }
+
+.event {
+  display: grid;
+  gap: var(--space-sm);
+  padding-block: var(--space-lg);
+  border-block-start: 1px solid var(--color-line);
+}
+
+.event:last-child { border-block-end: 1px solid var(--color-line); }
+
+@media (min-width: 52rem) {
+  .event {
+    grid-template-columns: 11rem 1fr auto;
+    align-items: start;
+    gap: var(--space-lg);
+  }
+}
+
+.event__date {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.event__note {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* Culture editorial */
+.editorial {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.editorial__feature,
+.editorial__item {
+  display: grid;
+  gap: var(--space-md);
+}
+
+@media (min-width: 52rem) {
+  .editorial__feature {
+    grid-template-columns: 1.25fr 0.75fr;
+    align-items: end;
+    gap: var(--space-lg);
+  }
+}
+
+.media,
+.release__art img,
+.artist__visual img {
+  outline: 1px solid var(--color-line);
+}
+
+.media {
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease;
+}
+
+.media--wide { aspect-ratio: 16 / 10; }
+.media--square { aspect-ratio: 1; }
+
+.events-hero-media { margin-block-end: var(--space-lg); }
+
+a.media:hover img,
+.editorial__item:hover .media img {
+  transform: scale(1.04);
+}
+
+/* Radio band */
+.band {
+  position: relative;
+  min-height: min(32rem, 78vh);
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+}
+
+.band__image {
+  position: absolute;
+  inset: 0;
+}
+
+.band__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.band__image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(13, 13, 13, 0.08) 0%, rgba(13, 13, 13, 0.7) 100%);
+}
+
+.band__content {
+  position: relative;
+  z-index: 1;
+  width: var(--wrap);
+  margin-inline: auto;
+  padding-block: var(--space-xl);
+}
+
+.split {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+@media (min-width: 52rem) {
+  .split { grid-template-columns: 1fr 1fr; }
+}
+
+/* Forms */
+.form {
+  display: grid;
+  gap: var(--space-md);
+  max-inline-size: 40rem;
+}
+
+.field { display: grid; gap: 0.4rem; }
+
+.field > label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.field .hint,
+.field-error {
+  font-size: var(--step--1);
+  color: var(--color-muted);
+}
+
+.field-error { color: #e07070; display: none; }
+.field.is-invalid .field-error { display: block; }
+
+.field input:not([type="checkbox"]),
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--color-faint);
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font: inherit;
+  border-radius: 0;
+}
+
+.field textarea { min-block-size: 10rem; resize: vertical; }
+
+.field.is-invalid input,
+.field.is-invalid select,
+.field.is-invalid textarea { border-color: #e07070; }
+
+.hp {
+  position: absolute;
+  inset-inline-start: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.consent {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.consent input { margin-block-start: 0.3rem; accent-color: var(--color-fg); }
+
+.form-status {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-line);
+  margin-block-end: var(--space-md);
+}
+
+.form-status--success { border-color: #6a8f6a; }
+.form-status--error { border-color: #e07070; }
+.form-status[hidden] { display: none; }
+.form__fields[hidden] { display: none; }
+.newsletter__fields[hidden] { display: none; }
+
+/* Footer */
+.site-footer {
+  padding-block: var(--space-lg) 0;
+  color: var(--color-muted);
+  font-size: var(--step--1);
+  overflow: hidden;
+}
+
+.site-footer__grid {
+  display: grid;
+  gap: var(--space-md);
+  padding-block-end: var(--space-lg);
+}
+
+@media (min-width: 52rem) {
+  .site-footer__grid { grid-template-columns: 2fr 1fr 1fr; }
+}
+
+.site-footer a { color: var(--color-muted); }
+.site-footer a:hover { color: var(--color-fg); }
+
+.site-footer nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.site-footer .brand {
+  font-family: var(--font-display);
+  color: var(--color-fg);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-size: var(--step-1);
+}
+
+.footer-mark {
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 22vw, 18rem);
+  line-height: 0.72;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  color: var(--color-fg);
+  opacity: 0.07;
+  margin: var(--space-md) 0 0;
+  user-select: none;
+}
+
+.flag {
+  display: inline-block;
+  border: 1px solid currentColor;
+  padding: 0.15rem 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+
+/* Preview player */
+.preview {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  margin: 0;
+}
+
+.preview__btn {
+  flex: 0 0 2rem;
+  width: 2rem;
+  height: 2rem;
+  min-inline-size: 2rem;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--color-fg);
+  background: var(--color-bg);
+  color: var(--color-fg);
+  cursor: pointer;
+}
+
+.preview__btn:hover,
+.preview__btn:focus-visible {
+  background: var(--color-fg);
+  color: var(--color-bg);
+}
+
+.preview__btn[aria-pressed="true"] {
+  background: var(--color-fg);
+  color: var(--color-bg);
+}
+
+.preview__icon {
+  width: 0.85rem;
+  height: 0.85rem;
+  display: block;
+}
+
+.preview__btn .preview__icon--pause { display: none; }
+.preview__btn[aria-pressed="true"] .preview__icon--play { display: none; }
+.preview__btn[aria-pressed="true"] .preview__icon--pause { display: block; }
+
+.preview__wave {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 1.7rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.preview__bar {
+  flex: 1 1 0;
+  width: 100%;
+  min-width: 1px;
+  height: max(18%, calc(var(--peak, 0.2) * 100%));
+  background: var(--color-muted);
+  opacity: 0.45;
+  transform-origin: center bottom;
+}
+
+.preview__bar.is-played {
+  background: var(--color-fg);
+  opacity: 1;
+}
+
+.preview.is-playing .preview__bar {
+  transform: scaleY(var(--live-amp, 1));
+}
+
+.preview__native {
+  display: block;
+  width: min(100%, 22rem);
+  height: 2.4rem;
+}
+
+html.js .preview__native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.preview__time {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+  white-space: nowrap;
+  min-inline-size: 5.6rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview.is-playing .preview__bar {
+    transform: none;
+  }
+}
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(1.1rem);
+  transition: opacity 0.85s ease, transform 0.85s ease;
+}
+
+[data-reveal].is-visible,
+[data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Header mark: show only the vinyl disc, not the square plate behind it. */
+.logo img {
+  clip-path: circle(36.328% at 50% 50%);
+  transform: scale(1.3);
+}
+
+/* Consent checkbox: square box beside a normal-case sentence, not a full-width input with a tiny caps label. */
+.field .consent {
+  display: grid;
+  grid-template-columns: 1.25rem 1fr;
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.field .consent input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  padding: 0;
+  margin: 0.15rem 0 0;
+  border: 1px solid var(--color-fg);
+  background: var(--color-bg);
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+}
+
+.field .consent input[type="checkbox"]::after {
+  content: "";
+  inline-size: 0.65rem;
+  block-size: 0.65rem;
+  background: var(--color-fg);
+  transform: scale(0);
+  transition: transform 0.12s ease;
+}
+
+.field .consent input[type="checkbox"]:checked::after { transform: scale(1); }
+
+.field .consent input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--color-fg);
+  outline-offset: 3px;
+}
+
+.field.is-invalid .consent input[type="checkbox"] { border-color: #e07070; }
+
+.field .consent label {
+  font-family: inherit;
+  font-size: var(--step--1, 0.9rem);
+  letter-spacing: normal;
+  text-transform: none;
+  line-height: 1.5;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+/* Release cover tag: small brutalist catalogue stamp on the right edge of the artwork. */
+.release__tag {
+  position: absolute;
+  inset-block-start: 1rem;
+  inset-inline-end: 0;
+  margin: 0;
+  padding: 0.4rem 0.6rem 0.35rem;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  border: 2px solid var(--color-fg);
+  border-inline-end: 0;
+  box-shadow: inset 0.35rem 0 0 var(--color-accent);
+  padding-inline-start: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* SR001 tag v2: Factory-style catalogue stamp, flush in the bottom-right corner.
+   Refs: Factory Records FAC numbering (Peter Saville), Warp and ECM catalogue
+   typography, and Hyperdub's corner marks. Flush to the edge, no rounded shapes. */
+.release__tag {
+  inset-block-start: auto;
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.55rem 0.7rem 0.5rem;
+  background: var(--color-fg);
+  color: var(--color-bg);
+  border: 0;
+  box-shadow: none;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.release__tag::before {
+  content: "";
+  justify-self: end;
+  inline-size: 1.6rem;
+  block-size: 3px;
+  background: var(--color-accent);
+}
+
+/* Tiny spinning record beside each Releases play button: appears on first play,
+   spins while playing, stops (and stays) when paused. */
+.preview__disc {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  inline-size: 0;
+  block-size: 1.15rem;
+  margin-inline-start: -0.55rem;
+  opacity: 0;
+  overflow: hidden;
+  color: var(--color-fg);
+  transition: inline-size 0.2s ease, margin 0.2s ease, opacity 0.2s ease;
+}
+
+.preview__disc img {
+  inline-size: 1.15rem;
+  block-size: 1.15rem;
+  max-inline-size: none;
+  flex: none;
+  clip-path: circle(36.328% at 50% 50%);
+  scale: 1.3;
+  animation: preview-disc-spin 1.8s linear infinite;
+  animation-play-state: paused;
+}
+
+.preview.has-played .preview__disc {
+  inline-size: 1.15rem;
+  margin-inline-start: 0;
+  opacity: 1;
+}
+
+.preview.is-playing .preview__disc img { animation-play-state: running; }
+
+@keyframes preview-disc-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .preview__disc img { animation: none; }
+}
+
+/* Record v3: always shown on all three tracks, larger, with white groove lines. */
+.preview__disc {
+  position: relative;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  margin-inline-start: 0;
+  opacity: 1;
+  overflow: visible;
+  border-radius: 50%;
+}
+
+.preview__disc img {
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+}
+
+.preview__disc::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-fg);
+  background: repeating-radial-gradient(
+    circle at 50% 50%,
+    transparent 0 0.2rem,
+    rgba(242, 240, 234, 0.55) 0.2rem calc(0.2rem + 1px),
+    transparent calc(0.2rem + 1px) 0.27rem
+  );
+  -webkit-mask: radial-gradient(circle, transparent 0 0.42rem, #000 0.43rem);
+          mask: radial-gradient(circle, transparent 0 0.42rem, #000 0.43rem);
+  pointer-events: none;
+}
+.preview.has-played .preview__disc { inline-size: 1.5rem; }
+
+/* Record v4: a proper little vinyl. Black disc, fine white grooves, a fixed light
+   sheen, and the vinyl logo as the spinning centre label. */
+.preview__disc,
+.preview.has-played .preview__disc {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.85rem;
+  block-size: 1.85rem;
+  margin-inline-start: 0;
+  opacity: 1;
+  overflow: hidden;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 0 0.42rem, #050505 0.42rem 0.47rem, transparent 0.47rem),
+    repeating-radial-gradient(circle at 50% 50%,
+      #0a0a0a 0 1.2px,
+      rgba(242, 240, 234, 0.32) 1.2px 1.7px,
+      #0a0a0a 1.7px 2.6px),
+    #0a0a0a;
+  box-shadow: 0 0 0 1px rgba(242, 240, 234, 0.85), 0 0 0 2px #0d0d0d;
+}
+
+.preview__disc img {
+  position: relative;
+  z-index: 1;
+  inline-size: 1.05rem;
+  block-size: 1.05rem;
+  border-radius: 50%;
+}
+
+/* Fixed sheen: two soft light wedges, like a real record under a light. */
+.preview__disc::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 20deg,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.22) 25deg,
+    transparent 55deg,
+    transparent 180deg,
+    rgba(255, 255, 255, 0.16) 205deg,
+    transparent 235deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 0.5rem, #000 0.52rem);
+          mask: radial-gradient(circle, transparent 0 0.5rem, #000 0.52rem);
+  pointer-events: none;
+}
+
+/* Spin the whole record (grooves + label); the sheen stays put. */
+.preview__disc img { animation: preview-disc-spin 1.8s linear infinite; animation-play-state: paused; }
+.preview.is-playing .preview__disc img { animation-play-state: running; }
+
+/* Additions for the dashboard-backed site. Same palette and type. */
+
+.media picture,
+.release__art picture,
+.artist__visual picture,
+.band__image picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.band__image picture img { width: 100%; height: 100%; object-fit: cover; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.share {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  align-items: baseline;
+  margin-block-start: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.share__label { color: var(--color-muted); }
+
+.share a,
+.share button {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.embed { margin-block: var(--space-sm); }
+.embed iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+}
+.embed p { margin-block: 0.4rem 0; }
+
+audio.mix { width: min(100%, 36rem); margin-block: var(--space-sm); }
+
+.newsletter { margin-block-start: var(--space-md); max-width: 28rem; }
+.newsletter .eyebrow { margin-block-end: 0.35rem; }
+.social-links { list-style: none; margin: 0.4rem 0 0; padding: 0; }
+
+.cookie {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 40;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  border-block-start: 1px solid var(--color-line-strong);
+}
+
+.cookie__inner {
+  width: var(--wrap);
+  margin-inline: auto;
+  padding-block: var(--space-sm);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cookie__inner p { margin: 0; max-width: 46rem; }
+.cookie__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.cookie[hidden] { display: none; }
+
+.template-banner {
+  border: 1px solid var(--color-accent);
+  padding: var(--space-sm);
+  max-width: 42rem;
+}
+
+.prose h2,
+.privacy h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  font-size: var(--step-2);
+  line-height: 1.05;
+  margin-block: var(--space-lg) var(--space-sm);
+}
+
+.prose h3 {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 500;
+  margin-block: var(--space-md) var(--space-xs);
+}
+
+.prose p,
+.prose li { max-width: 42rem; }
+
+.prose ul { padding-inline-start: 1.15rem; }
+.prose strong { font-weight: 650; }
+
+.privacy a { text-decoration: underline; }

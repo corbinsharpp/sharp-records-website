@@ -1,0 +1,44 @@
+---
+import type { Release, Artist } from "../lib/content";
+import SmartImage from "./SmartImage.astro";
+import Tracklist from "./Tracklist.astro";
+import Share from "./Share.astro";
+import Embeds from "./Embeds.astro";
+
+interface Props {
+  release: Release;
+  artist?: Artist;
+  variant: "home" | "catalogue";
+  idPrefix: string;
+  listenLabel?: string;
+  artistLabel?: string;
+}
+
+const { release, artist, variant, idPrefix, listenLabel = "Listen now", artistLabel = "The artist" } = Astro.props;
+const meta = [release.data.catalogNumber, release.data.format, variant === "home" ? release.data.genre : ""]
+  .filter(Boolean)
+  .join(" · ");
+const summary = variant === "home" ? release.data.homeSummary || release.data.summary : release.data.summary;
+const sizes = "(min-width: 52rem) min(40vw, 28rem), 100vw";
+---
+
+<article class="release" id={variant === "home" ? `home-${release.id}` : release.id}>
+  <div class="release__art">
+    <SmartImage src={release.data.cover} alt={release.data.coverAlt} sizes={sizes} loading={variant === "catalogue" ? "eager" : "lazy"} />
+    {variant === "catalogue" && <p class="release__tag" aria-hidden="true">{release.data.catalogNumber}</p>}
+  </div>
+  <div>
+    <p class="meta">{meta}</p>
+    {variant === "home" ? <h3>{release.data.title}</h3> : <h2>{release.data.title}</h2>}
+    <p>{summary}</p>
+    <Tracklist tracks={release.data.tracks} idPrefix={idPrefix} />
+    <Embeds bandcamp={release.data.bandcamp} soundcloud={release.data.soundcloud} spotify={release.data.spotify} mixcloud={release.data.mixcloud} youtube={release.data.youtube} />
+    {variant === "catalogue" && <Share path={`/releases/${release.id}.html`} title={`${release.data.title} — Sharp Records`} />}
+    {variant === "home" && artist && (
+      <div class="button-row">
+        <a class="button" href={`/releases.html#${release.id}`}>{listenLabel}</a>
+        <a class="button button--ghost" href={`/artists.html#${artist.id}`}>{artistLabel}</a>
+      </div>
+    )}
+  </div>
+</article>

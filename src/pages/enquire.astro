@@ -1,0 +1,94 @@
+---
+import Layout from "../components/Layout.astro";
+import { getSite } from "../lib/content";
+import { organization } from "../lib/schema";
+import { turnstileSiteKey } from "../lib/site";
+
+const site = await getSite();
+const page = site.sections.enquire;
+const turnstile = turnstileSiteKey();
+---
+
+<Layout title={`${page.data.title} | Sharp Records`} description={page.data.description} jsonLd={{ "@context": "https://schema.org", "@graph": [organization({ email: site.settings.data.email, city: site.settings.data.city, country: site.settings.data.country, countryCode: site.settings.data.countryCode, genres: site.genres, description: page.data.description })] }}>
+  <header class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">{page.data.eyebrow}</p>
+      <h1>{page.data.title}</h1>
+      <p class="lede">{page.data.lede}</p>
+    </div>
+  </header>
+  <section class="section">
+    <div class="wrap">
+      <div id="form-success" class="form-status form-status--success" tabindex="-1" hidden>
+        <p>Thank you. Your enquiry has been sent and we will reply as soon as we can.</p>
+      </div>
+      <div id="form-error" class="form-status form-status--error" role="alert" hidden>
+        <p>Sorry — the message could not be sent just now. Please try again, or use the email link below.</p>
+      </div>
+
+      <form class="form" id="enquire-form" action="/api/enquire" method="post" data-mailto={site.settings.data.email} novalidate>
+        <div class="form__fields">
+          <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+          <div class="field">
+            <label for="enquiry-type">Enquiry type</label>
+            <select id="enquiry-type" name="enquiry-type" required aria-describedby="enquiry-type-error">
+              <option value="">Select a type</option>
+              <option value="Bookings">Bookings</option>
+              <option value="Demo submission">Demo submission</option>
+              <option value="Press">Press</option>
+              <option value="Licensing/Sync">Licensing/Sync</option>
+              <option value="Other">Other</option>
+            </select>
+            <p class="field-error" id="enquiry-type-error">Please choose an enquiry type.</p>
+          </div>
+
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" autocomplete="name" required minlength="2" aria-describedby="name-error">
+            <p class="field-error" id="name-error">Please enter your name.</p>
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required aria-describedby="email-error">
+            <p class="field-error" id="email-error">Please enter a valid email address.</p>
+          </div>
+
+          <div class="field">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" required minlength="10" aria-describedby="message-error"></textarea>
+            <p class="field-error" id="message-error">Please write a message of at least a few words.</p>
+          </div>
+
+          <div class="field">
+            <label for="demo-link">Demo link <span class="hint">(optional)</span></label>
+            <input id="demo-link" name="demo-link" type="url" inputmode="url" placeholder="https://" aria-describedby="demo-link-hint demo-link-error">
+            <p class="hint" id="demo-link-hint">A private SoundCloud, Dropbox or similar link if you are sending music.</p>
+            <p class="field-error" id="demo-link-error">Please enter a full URL starting with http:// or https://.</p>
+          </div>
+
+          {turnstile && (
+            <div class="field">
+              <div class="cf-turnstile" data-sitekey={turnstile} data-theme="dark"></div>
+              <p class="field-error" id="turnstile-error">Please confirm you are a person before sending.</p>
+            </div>
+          )}
+
+          <div class="field">
+            <div class="consent">
+              <input id="consent" name="consent" type="checkbox" value="yes" required aria-describedby="consent-error">
+              <label for="consent">I agree that Sharp Records may use these details to reply to this enquiry. We will not add you to a mailing list unless you ask. <a href="/privacy.html">Privacy</a></label>
+            </div>
+            <p class="field-error" id="consent-error">Please confirm you are happy for us to use your details to reply.</p>
+          </div>
+
+          <p>
+            <button class="button" type="submit">Send message</button>
+          </p>
+          <p class="meta">Prefer email? <a id="mailto-fallback" href={`mailto:${site.settings.data.email}`}>{site.settings.data.email}</a></p>
+        </div>
+      </form>
+    </div>
+  </section>
+</Layout>

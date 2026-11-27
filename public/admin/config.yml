@@ -1,0 +1,579 @@
+# Sharp Records dashboard.
+# On Cloudflare, /admin/config.yml is generated per request from this file.
+# base_url follows the address in the browser unless SITE_AUTH_ORIGIN is set.
+# branch follows CMS_BRANCH, otherwise the branch named below.
+# Corby edits this site at /admin. Drafts stay off the website until he presses Publish.
+# Images land in src/assets/uploads. Short audio previews land in public/assets/audio.
+
+local_backend: true
+publish_mode: editorial_workflow
+
+backend:
+  name: github
+  repo: corbinsharpp/sharp-records-website
+  branch: "cursor/cms-dashboard-784c"
+  base_url: https://sharp-records-website.pages.dev
+  auth_endpoint: api/auth
+
+site_url: https://sharp-records-website.pages.dev
+display_url: https://sharp-records-website.pages.dev
+show_preview_links: true
+logo_url: /assets/img/logo-vinyl.svg
+
+media_folder: src/assets/uploads
+public_folder: /src/assets/uploads
+
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: "-"
+
+editor:
+  preview: false
+
+collections:
+  - name: releases
+    label: Releases
+    label_singular: Release
+    description: Records in the catalogue. Save keeps a draft. Set the status to Ready, then press Publish, when it should appear on the site.
+    folder: src/content/releases
+    create: true
+    slug: "{{catalogNumber}}"
+    identifier_field: title
+    summary: "{{catalogNumber}} · {{title}}"
+    preview_path: "releases/{{slug}}.html"
+    fields:
+      - label: Title
+        name: title
+        widget: string
+        hint: "The name on the release, for example Bloom’s Village."
+      - label: Catalogue number
+        name: catalogNumber
+        widget: string
+        hint: "SR001, SR002 and so on. This also becomes the link the first time you save. Use capitals, like SR002."
+      - label: Format
+        name: format
+        widget: select
+        options: ["Single", "EP", "Album", "Compilation"]
+        default: "EP"
+        hint: "Shown next to the catalogue number."
+      - label: Genre
+        name: genre
+        widget: string
+        required: false
+        hint: "A short description such as Experimental electronic. Leave blank if you would rather not label it."
+      - label: Position
+        name: order
+        widget: number
+        default: 1
+        value_type: int
+        min: 1
+        hint: "1 appears first. Put the newest release at 1 and move older ones down."
+      - label: Artist
+        name: artist
+        widget: relation
+        collection: artists
+        search_fields: ["name"]
+        value_field: "{{slug}}"
+        display_fields: ["name"]
+        hint: "Pick someone from Artists. Add the artist there first if they are new."
+      - label: Text on the releases page
+        name: summary
+        widget: text
+        hint: "The paragraph under the title on the Releases page."
+      - label: Text on the homepage
+        name: homeSummary
+        widget: text
+        required: false
+        hint: "Optional shorter or different paragraph for the homepage. Leave blank to reuse the releases page text."
+      - label: Cover artwork
+        name: cover
+        widget: image
+        hint: "Square picture, at least 1200 by 1200 pixels. You will see a preview after it uploads."
+      - label: Description of the cover
+        name: coverAlt
+        widget: string
+        hint: "Required. Describe the artwork for someone who cannot see it. Do not write only “cover”."
+      - label: Bandcamp link or embed
+        name: bandcamp
+        widget: string
+        required: false
+        hint: "Paste a Bandcamp link, or the embed code from Bandcamp’s Share button. Leave blank if you do not use it."
+      - label: SoundCloud link or embed
+        name: soundcloud
+        widget: string
+        required: false
+        hint: "Paste a SoundCloud link or embed code. Leave blank if you do not use it."
+      - label: Spotify link
+        name: spotify
+        widget: string
+        required: false
+        hint: "A link from open.spotify.com. Leave blank if you do not use it."
+      - label: Mixcloud link
+        name: mixcloud
+        widget: string
+        required: false
+        hint: "A Mixcloud link. Leave blank if you do not use it."
+      - label: YouTube link
+        name: youtube
+        widget: string
+        required: false
+        hint: "A YouTube link. Leave blank if you do not use it."
+      - label: Tracks
+        name: tracks
+        widget: list
+        summary: "{{fields.title}}"
+        hint: "Add the tracks in order. A preview is optional and should be about 15 seconds."
+        fields:
+          - label: Track title
+            name: title
+            widget: string
+          - label: Preview MP3
+            name: previewMp3
+            widget: file
+            required: false
+            media_folder: public/assets/audio
+            public_folder: /assets/audio
+            hint: "Optional MP3, about 15 seconds. For a full mix, use SoundCloud, Mixcloud or YouTube instead. GitHub cannot store a file over 100MB."
+          - label: Preview M4A
+            name: previewM4a
+            widget: file
+            required: false
+            media_folder: public/assets/audio
+            public_folder: /assets/audio
+            hint: "Optional. Only needed if you also have an M4A file, as on SR001."
+          - label: Preview OGG
+            name: previewOgg
+            widget: file
+            required: false
+            media_folder: public/assets/audio
+            public_folder: /assets/audio
+            hint: "Optional. Only needed if you also have an OGG file."
+          - label: Waveform file
+            name: peaks
+            widget: file
+            required: false
+            media_folder: public/assets/audio
+            public_folder: /assets/audio
+            hint: "Leave blank. The vinyl button still works. This file only draws the little bars."
+
+  - name: artists
+    label: Artists
+    label_singular: Artist
+    description: People on the label. Photograph and biography live here.
+    folder: src/content/artists
+    create: true
+    slug: "{{name}}"
+    identifier_field: name
+    summary: "{{name}}"
+    preview_path: "artists/{{slug}}.html"
+    fields:
+      - label: Name
+        name: name
+        widget: string
+        hint: "The name you want on the site, for example Bloom’s Village."
+      - label: City or base
+        name: location
+        widget: string
+        hint: "Shown in the small line above the name. Example: Manchester."
+      - label: Style
+        name: style
+        widget: string
+        hint: "A few words, such as Experimental electronic."
+      - label: Other name
+        name: alternateName
+        widget: string
+        required: false
+        hint: "Optional. A real name for search engines, such as Will Holton. It is not printed as its own heading."
+      - label: Position
+        name: order
+        widget: number
+        default: 1
+        value_type: int
+        min: 1
+        hint: "1 appears first."
+      - label: Photograph
+        name: photo
+        widget: image
+        hint: "A photograph, or a picture if you do not have a portrait. You will see a preview here."
+      - label: Description of the photograph
+        name: photoAlt
+        widget: string
+        hint: "Required. Say what the picture shows. If it is not a portrait, say so."
+      - label: Biography
+        name: body
+        widget: markdown
+        hint: "The artist’s story. Write ordinary sentences. Press Enter twice to start a new paragraph."
+
+  - name: events
+    label: Events
+    label_singular: Event
+    description: Nights and live dates. Add a ticket link when you have one.
+    folder: src/content/events
+    create: true
+    slug: "{{title}}"
+    identifier_field: title
+    summary: "{{title}}"
+    preview_path: "events/{{slug}}.html"
+    fields:
+      - label: Name
+        name: title
+        widget: string
+        hint: "The full name, for example Sharp Records launch night."
+      - label: Short name on the homepage
+        name: shortTitle
+        widget: string
+        required: false
+        hint: "Optional. A shorter name for the homepage, such as Launch night. Leave blank to use the full name."
+      - label: Starts
+        name: start
+        widget: string
+        pattern: ['^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$', "Use 2027-03-20T22:00:00+00:00"]
+        hint: "Date and UK time. Winter (GMT) ends with +00:00. British Summer Time ends with +01:00. Example: 2027-03-20T22:00:00+00:00"
+      - label: City
+        name: city
+        widget: string
+        default: Manchester
+      - label: Venue
+        name: venue
+        widget: string
+        hint: "The room name, or Venue TBA if it is not booked."
+      - label: Still a placeholder
+        name: placeholder
+        widget: boolean
+        default: false
+        hint: "Tick this while the date is not confirmed. A small Placeholder label is shown."
+      - label: Text on the events page
+        name: body
+        widget: markdown
+        hint: "The paragraph on the Events page."
+      - label: Text on the homepage
+        name: home
+        widget: text
+        required: false
+        hint: "Optional different sentence for the homepage."
+      - label: Sentence for search engines
+        name: schemaDescription
+        widget: text
+        required: false
+        hint: "Optional. One sentence Google can read. Leave blank to reuse the events page text."
+      - label: Ticket link
+        name: ticketUrl
+        widget: string
+        required: false
+        hint: "The full ticket URL, starting with https://. Leave blank and the site says Details forthcoming."
+      - label: Artist playing
+        name: performer
+        widget: relation
+        collection: artists
+        search_fields: ["name"]
+        value_field: "{{slug}}"
+        display_fields: ["name"]
+        required: false
+        hint: "Optional. Used in the hidden event details for search engines."
+
+  - name: radio
+    label: Radio
+    label_singular: Episode
+    description: Mixes and shows. Prefer a SoundCloud, Mixcloud or YouTube link for a full episode.
+    folder: src/content/radio
+    create: true
+    slug: "{{title}}"
+    identifier_field: title
+    summary: "{{title}}"
+    preview_path: "radio/{{slug}}.html"
+    fields:
+      - label: Title
+        name: title
+        widget: string
+      - label: Date
+        name: date
+        widget: string
+        required: false
+        pattern: ['^$|^\\d{4}-\\d{2}-\\d{2}$', "Use 2026-11-06 or leave blank"]
+        hint: "The day it went out, written 2026-11-06. Leave blank if there is no date yet."
+      - label: Cover image
+        name: cover
+        widget: image
+        required: false
+        hint: "Optional picture. You will see a preview if you add one."
+      - label: Description of the cover
+        name: coverAlt
+        widget: string
+        required: false
+        hint: "Required if you added a cover. Say what the picture shows."
+      - label: Description
+        name: body
+        widget: markdown
+        hint: "What the episode is. Ordinary sentences."
+      - label: Audio file
+        name: audio
+        widget: file
+        required: false
+        media_folder: public/assets/audio
+        public_folder: /assets/audio
+        hint: "Optional file. A full mix is better as a SoundCloud, Mixcloud or YouTube link below. GitHub will refuse a file bigger than 100MB."
+      - { label: Bandcamp link or embed, name: bandcamp, widget: string, required: false, hint: "Leave blank if you do not use Bandcamp." }
+      - { label: SoundCloud link or embed, name: soundcloud, widget: string, required: false, hint: "Paste a SoundCloud link or the embed code." }
+      - { label: Spotify link, name: spotify, widget: string, required: false, hint: "A link from open.spotify.com, or leave blank." }
+      - { label: Mixcloud link, name: mixcloud, widget: string, required: false, hint: "A Mixcloud link, or leave blank." }
+      - { label: YouTube link, name: youtube, widget: string, required: false, hint: "A YouTube link, or leave blank." }
+
+  - name: culture
+    label: Culture
+    label_singular: Article
+    description: Editorial pieces. Essays, notes and interviews.
+    folder: src/content/culture
+    create: true
+    slug: "{{title}}"
+    identifier_field: title
+    summary: "{{title}}"
+    preview_path: "culture/{{slug}}.html"
+    fields:
+      - label: Headline
+        name: title
+        widget: string
+      - label: Date
+        name: date
+        widget: string
+        required: false
+        pattern: ['^$|^\\d{4}-\\d{2}-\\d{2}$', "Use 2026-11-06 or leave blank"]
+        hint: "Written 2026-11-06. Leave blank if you would rather show the label below."
+      - label: Label instead of a date
+        name: meta
+        widget: string
+        required: false
+        hint: "Optional, for example Signing. Used when there is no date."
+      - label: Flag
+        name: flag
+        widget: string
+        required: false
+        hint: "Optional small label such as Placeholder. Leave blank for a normal piece."
+      - label: Short summary
+        name: excerpt
+        widget: text
+        hint: "One or two sentences. This is the text on the homepage."
+      - label: Picture
+        name: image
+        widget: image
+        required: false
+        hint: "Optional. Wide pictures work best. You will see a preview."
+      - label: Description of the picture
+        name: imageAlt
+        widget: string
+        required: false
+        hint: "Required if you added a picture."
+      - label: Show on the homepage
+        name: featureOnHome
+        widget: boolean
+        default: false
+        hint: "Tick this to include the piece on the homepage."
+      - label: Position
+        name: order
+        widget: number
+        default: 1
+        value_type: int
+        min: 1
+        hint: "1 appears first."
+      - label: Linked release
+        name: release
+        widget: relation
+        collection: releases
+        search_fields: ["title", "catalogNumber"]
+        value_field: "{{slug}}"
+        display_fields: ["catalogNumber", "title"]
+        required: false
+        hint: "Optional. Adds a See the release link."
+      - label: Article
+        name: body
+        widget: markdown
+        hint: "The full piece. Press Enter twice between paragraphs."
+
+  - name: homepage
+    label: Homepage
+    description: The words on the front page. The manifesto itself is edited under About.
+    files:
+      - label: Homepage
+        name: homepage
+        file: src/content/pages/homepage.md
+        preview_path: index.html
+        fields:
+          - { label: Browser title, name: seoTitle, widget: string, hint: "The words in the browser tab." }
+          - { label: Search description, name: seoDescription, widget: text, hint: "The sentence search engines show under the link." }
+          - { label: Small line above the slogan, name: kicker, widget: string }
+          - label: Slogan
+            name: statement
+            widget: text
+            hint: "One line per row. The slogan is: No fixed genres. / No creative limits. / No compromises."
+          - label: Top line
+            name: mast
+            widget: text
+            hint: "The three small words across the top. One on each line."
+          - { label: Listen button, name: listenLabel, widget: string }
+          - { label: Manifesto button, name: manifestoButton, widget: string }
+          - { label: Manifesto text link, name: manifestoLink, widget: string }
+          - { label: Artist button, name: artistButton, widget: string }
+          - { label: Read link, name: readLabel, widget: string, hint: "The word on culture links, currently Read." }
+          - { label: Manifesto section label, name: manifestoIndex, widget: string }
+          - { label: Catalogue section label, name: catalogueIndex, widget: string }
+          - { label: Catalogue heading, name: catalogueHeading, widget: string }
+          - { label: Catalogue link, name: catalogueLink, widget: string }
+          - { label: Artists section label, name: rosterIndex, widget: string }
+          - { label: Artists heading, name: rosterHeading, widget: string }
+          - { label: Artists link, name: rosterLink, widget: string }
+          - { label: Events section label, name: liveIndex, widget: string }
+          - { label: Events heading, name: liveHeading, widget: string }
+          - { label: Events link, name: liveLink, widget: string }
+          - { label: Radio section label, name: radioIndex, widget: string }
+          - { label: Radio heading, name: radioHeading, widget: string }
+          - { label: Radio button, name: radioButton, widget: string }
+          - { label: Culture section label, name: cultureIndex, widget: string }
+          - { label: Culture heading, name: cultureHeading, widget: string }
+          - { label: Culture link, name: cultureLink, widget: string }
+          - { label: Contact section label, name: contactIndex, widget: string }
+          - { label: Contact heading, name: contactHeading, widget: string }
+          - label: Featured release
+            name: featuredRelease
+            widget: relation
+            collection: releases
+            search_fields: ["title", "catalogNumber"]
+            value_field: "{{slug}}"
+            display_fields: ["catalogNumber", "title"]
+            hint: "The record in the Listen now block."
+          - label: Featured artist
+            name: featuredArtist
+            widget: relation
+            collection: artists
+            search_fields: ["name"]
+            value_field: "{{slug}}"
+            display_fields: ["name"]
+            hint: "The artist shown on the homepage."
+
+  - name: about
+    label: About
+    description: The manifesto. The homepage uses this same text.
+    files:
+      - label: About
+        name: about
+        file: src/content/pages/about.md
+        preview_path: about.html
+        fields:
+          - { label: Small label, name: eyebrow, widget: string }
+          - { label: Page title, name: title, widget: string }
+          - { label: Intro line, name: lede, widget: text }
+          - { label: Search description, name: description, widget: text }
+          - { label: Manifesto heading, name: heading, widget: string }
+          - label: Closing lines
+            name: closing
+            widget: text
+            hint: "One line per row. This is the slogan at the end of the manifesto."
+          - { label: Picture, name: image, widget: image, hint: "The picture above the manifesto." }
+          - { label: Description of the picture, name: imageAlt, widget: string, hint: "Required. Say what the picture shows." }
+          - { label: Manifesto, name: body, widget: markdown, hint: "Each paragraph is separated by a blank line. This text is also used on the homepage." }
+
+  - name: sections
+    label: Section pages
+    description: The introduction at the top of Releases, Artists, Events, Radio, Culture and Enquire.
+    files:
+      - label: Releases page
+        name: releases
+        file: src/content/sections/releases.md
+        preview_path: releases.html
+        fields: &intro
+          - { label: Small label, name: eyebrow, widget: string }
+          - { label: Heading, name: title, widget: string }
+          - { label: Intro, name: lede, widget: text }
+          - { label: Search description, name: description, widget: text }
+      - label: Artists page
+        name: artists
+        file: src/content/sections/artists.md
+        preview_path: artists.html
+        fields: *intro
+      - label: Events page
+        name: events
+        file: src/content/sections/events.md
+        preview_path: events.html
+        fields:
+          - { label: Small label, name: eyebrow, widget: string }
+          - { label: Heading, name: title, widget: string }
+          - { label: Intro, name: lede, widget: text }
+          - { label: Search description, name: description, widget: text }
+          - { label: Picture, name: image, widget: image, required: false }
+          - { label: Description of the picture, name: imageAlt, widget: string, hint: "Required if there is a picture." }
+      - label: Radio page
+        name: radio
+        file: src/content/sections/radio.md
+        preview_path: radio.html
+        fields:
+          - { label: Small label, name: eyebrow, widget: string }
+          - { label: Heading, name: title, widget: string }
+          - { label: Intro, name: lede, widget: text, hint: "The paragraph under the Radio heading." }
+          - { label: Homepage sentence, name: homeLede, widget: text, hint: "The radio sentence on the homepage." }
+          - { label: Search description, name: description, widget: text }
+          - { label: Picture, name: image, widget: image, required: false }
+          - { label: Description of the picture, name: imageAlt, widget: string, hint: "Required if there is a picture." }
+          - { label: Empty-state flag, name: noteFlag, widget: string, required: false, hint: "Shown only when there are no episodes. Currently Forthcoming." }
+          - { label: Empty-state heading, name: noteHeading, widget: string, required: false }
+          - { label: Empty-state text, name: body, widget: markdown, hint: "Shown only when there are no episodes." }
+      - label: Culture page
+        name: culture
+        file: src/content/sections/culture.md
+        preview_path: culture.html
+        fields: *intro
+      - label: Enquire page
+        name: enquire
+        file: src/content/sections/enquire.md
+        preview_path: enquire.html
+        fields:
+          - { label: Small label, name: eyebrow, widget: string }
+          - { label: Heading, name: title, widget: string, hint: "Keep this as Enquire." }
+          - { label: Intro on this page, name: lede, widget: text }
+          - { label: Intro on the homepage, name: homeLede, widget: text }
+          - { label: Search description, name: description, widget: text }
+
+  - name: settings
+    label: Settings
+    description: Email address, the ticker, social links and the newsletter wording.
+    files:
+      - label: Settings
+        name: settings
+        file: src/content/pages/settings.md
+        fields:
+          - { label: Email, name: email, widget: string, hint: "Shown in the footer and on the Enquire page." }
+          - { label: City, name: city, widget: string }
+          - { label: Country, name: country, widget: string }
+          - { label: Country code, name: countryCode, widget: string, hint: "GB for the United Kingdom." }
+          - { label: Location line, name: locationLine, widget: string, hint: "The line in the footer, currently Manchester, United Kingdom." }
+          - label: Ticker words
+            name: genres
+            widget: text
+            hint: "One word or phrase per line. These scroll across the homepage."
+          - label: Social links
+            name: social
+            widget: list
+            required: false
+            hint: "Add a link only for a profile that exists. Leave this empty if you do not want any."
+            fields:
+              - { label: Name, name: label, widget: string, hint: "For example Instagram." }
+              - { label: URL, name: url, widget: string, hint: "The full address, starting with https://." }
+          - { label: Newsletter heading, name: newsletterHeading, widget: string }
+          - { label: Newsletter sentence, name: newsletterText, widget: text, hint: "Say what the email is, in one or two sentences." }
+          - { label: Newsletter consent tick-box, name: newsletterConsent, widget: text, hint: "The words next to the tick box. People must tick this before they are added." }
+
+  - name: privacy
+    label: Privacy
+    description: The privacy page. It is a draft until you tick the review box.
+    files:
+      - label: Privacy
+        name: privacy
+        file: src/content/pages/privacy.md
+        preview_path: privacy.html
+        fields:
+          - { label: Page title, name: title, widget: string }
+          - { label: Search description, name: description, widget: text }
+          - label: I have reviewed this page
+            name: reviewed
+            widget: boolean
+            default: false
+            hint: "Leave this off until you have read the page and replaced every note in square brackets. Tick it, then press Publish, to remove the draft banner."
+          - { label: Page text, name: body, widget: markdown, hint: "Replace anything in square brackets. Do not add a company number or street address you do not have." }

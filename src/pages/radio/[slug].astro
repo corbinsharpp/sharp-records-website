@@ -1,0 +1,47 @@
+---
+import { getEntry, render } from "astro:content";
+import { readdirSync } from "node:fs";
+import path from "node:path";
+import Layout from "../../components/Layout.astro";
+import SmartImage from "../../components/SmartImage.astro";
+import Embeds from "../../components/Embeds.astro";
+import Share from "../../components/Share.astro";
+import { getSite } from "../../lib/content";
+import { formatDate } from "../../lib/text";
+import { organization } from "../../lib/schema";
+import { shareImage } from "../../lib/images";
+
+export async function getStaticPaths() {
+  const directory = path.join(process.cwd(), "src/content/radio");
+  const files = readdirSync(directory).filter((name) => name.endsWith(".md"));
+  return files.map((name) => ({ params: { slug: name.replace(/\.md$/, "") } }));
+}
+
+const episode = await getEntry("radio", Astro.params.slug!);
+if (!episode) throw new Error("Missing episode");
+const site = await getSite();
+const { Content } = await render(episode);
+const image = episode.data.cover ? await shareImage(episode.data.cover) : undefined;
+---
+
+<Layout title={`${episode.data.title} | Sharp Records`} description={episode.data.title} ogImage={image} jsonLd={{ "@context": "https://schema.org", "@graph": [organization({ email: site.settings.data.email, city: site.settings.data.city, country: site.settings.data.country, countryCode: site.settings.data.countryCode, genres: site.genres, description: site.homepage.data.seoDescription }), { "@type": "AudioObject", name: episode.data.title, description: episode.body?.trim() || episode.data.title, ...(episode.data.date ? { uploadDate: episode.data.date.slice(0, 10) } : {}), ...(episode.data.audio ? { contentUrl: episode.data.audio.startsWith("http") ? episode.data.audio : undefined } : {}), publisher: { "@id": "https://sharprecords.uk/#label" } }] }}>
+  <header class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">{episode.data.date ? formatDate(episode.data.date) : "Radio"}</p>
+      <h1>{episode.data.title}</h1>
+    </div>
+  </header>
+  <section class="section">
+    <div class="wrap">
+      {episode.data.cover && (
+        <div class="media media--wide events-hero-media">
+          <SmartImage src={episode.data.cover} alt={episode.data.coverAlt || ""} sizes="(min-width: 52rem) 42rem, 100vw" loading="eager" required={false} />
+        </div>
+      )}
+      <Content />
+      {episode.data.audio && <audio class="mix" controls preload="none" src={episode.data.audio}><a href={episode.data.audio}>Listen</a></audio>}
+      <Embeds bandcamp={episode.data.bandcamp} soundcloud={episode.data.soundcloud} spotify={episode.data.spotify} mixcloud={episode.data.mixcloud} youtube={episode.data.youtube} />
+      <Share path={`/radio/${episode.id}.html`} title={`${episode.data.title} — Sharp Records`} />
+    </div>
+  </section>
+</Layout>

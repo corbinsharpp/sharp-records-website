@@ -1,0 +1,80 @@
+---
+import { getSite } from "../lib/content";
+import { turnstileSiteKey } from "../lib/site";
+
+const { settings } = await getSite();
+const turnstile = turnstileSiteKey();
+const nav = [
+  ["/releases.html", "Releases"],
+  ["/artists.html", "Artists"],
+  ["/events.html", "Events"],
+  ["/radio.html", "Radio"],
+  ["/culture.html", "Culture"],
+  ["/about.html", "About"],
+  ["/enquire.html", "Enquire"],
+];
+---
+
+<footer class="site-footer">
+  <div class="wrap site-footer__grid">
+    <div>
+      <a class="brand" href="/index.html">Sharp Records</a>
+      <form class="newsletter" id="newsletter-form" action="/api/newsletter" method="post" novalidate>
+        <p class="eyebrow" id="newsletter-heading">{settings.data.newsletterHeading}</p>
+        <p id="newsletter-text">{settings.data.newsletterText}</p>
+        <div id="newsletter-success" class="form-status form-status--success" tabindex="-1" hidden>
+          <p>Check your inbox to confirm. Nothing is sent until you do.</p>
+        </div>
+        <div id="newsletter-error" class="form-status form-status--error" role="alert" hidden>
+          <p>Sorry — that could not be saved just now. Please try again in a moment.</p>
+        </div>
+        <div class="newsletter__fields">
+          <input class="hp" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="field">
+            <label for="newsletter-email">Email</label>
+            <input id="newsletter-email" name="email" type="email" autocomplete="email" required aria-describedby="newsletter-email-error">
+            <p class="field-error" id="newsletter-email-error">Please enter the email address you want on the list.</p>
+          </div>
+          <div class="field">
+            <div class="consent">
+              <input id="newsletter-consent" name="consent" type="checkbox" value="yes" required aria-describedby="newsletter-consent-error">
+              <label for="newsletter-consent">{settings.data.newsletterConsent}</label>
+            </div>
+            <p class="field-error" id="newsletter-consent-error">Please tick the box if you want the email.</p>
+          </div>
+          {turnstile && (
+            <div class="field">
+              <div class="cf-turnstile" data-sitekey={turnstile} data-theme="dark"></div>
+              <p class="field-error" id="newsletter-turnstile-error">Please confirm you are a person before joining.</p>
+            </div>
+          )}
+          <p><button class="button" type="submit">Subscribe</button></p>
+          <p class="meta"><a href="/privacy.html">Privacy</a></p>
+        </div>
+      </form>
+    </div>
+    <div>
+      <p class="eyebrow">Explore</p>
+      <nav aria-label="Footer">
+        <ul>
+          {nav.map(([href, label]) => <li><a href={href.trim()}>{label}</a></li>)}
+        </ul>
+      </nav>
+    </div>
+    <div>
+      <p class="eyebrow">Contact</p>
+      <p><a href="/enquire.html">Enquire</a></p>
+      <p><a href={`mailto:${settings.data.email}`}>{settings.data.email}</a></p>
+      <p>{settings.data.locationLine}</p>
+      {settings.data.social.length > 0 && (
+        <ul class="social-links">
+          {settings.data.social.map((link) => (
+            <li><a href={link.url} rel="me noopener noreferrer">{link.label}</a></li>
+          ))}
+        </ul>
+      )}
+      <p><a href="/privacy.html">Privacy</a></p>
+    </div>
+  </div>
+  <p class="wrap footer-mark" aria-hidden="true">SHARP</p>
+</footer>

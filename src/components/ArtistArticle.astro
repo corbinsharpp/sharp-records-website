@@ -1,0 +1,44 @@
+---
+import { render } from "astro:content";
+import type { Artist, Release } from "../lib/content";
+import { releasesFor } from "../lib/content";
+import SmartImage from "./SmartImage.astro";
+
+interface Props {
+  artist: Artist;
+  releases: Release[];
+  variant: "home" | "page";
+  linkLabel?: string;
+}
+
+const { artist, releases, variant, linkLabel = "Artist page" } = Astro.props;
+const { Content } = await render(artist);
+const work = releasesFor(artist.id, releases);
+---
+
+<article class="artist" id={variant === "page" ? artist.id : undefined}>
+  <div class="artist__visual">
+    <SmartImage src={artist.data.photo} alt={artist.data.photoAlt} sizes="(min-width: 52rem) 28rem, 100vw" loading={variant === "page" ? "eager" : "lazy"} />
+  </div>
+  <div>
+    <p class="meta">{artist.data.location} · {artist.data.style}</p>
+    {variant === "home" ? <h3>{artist.data.name}</h3> : <h2>{artist.data.name}</h2>}
+    <Content />
+    {variant === "page" && work.length > 0 && (
+      <>
+        <p class="eyebrow">Selected work</p>
+        <ul class="tracklist">
+          {work.map((release) => (
+            <li><span>{release.data.title}</span><span>{release.data.catalogNumber}</span></li>
+          ))}
+        </ul>
+        <p><a class="button" href={`/releases.html#${work[0].id}`}>Listen now</a></p>
+      </>
+    )}
+    {variant === "home" && (
+      <div class="button-row">
+        <a class="button" href={`/artists.html#${artist.id}`}>{linkLabel}</a>
+      </div>
+    )}
+  </div>
+</article>

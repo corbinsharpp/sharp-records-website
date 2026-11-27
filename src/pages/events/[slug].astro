@@ -1,0 +1,44 @@
+---
+import { getCollection, getEntry, render } from "astro:content";
+import Layout from "../../components/Layout.astro";
+import Share from "../../components/Share.astro";
+import { getSite } from "../../lib/content";
+import { formatDate } from "../../lib/text";
+import { organization, eventSchema } from "../../lib/schema";
+
+export async function getStaticPaths() {
+  const events = await getCollection("events");
+  return events.map((event) => ({ params: { slug: event.id } }));
+}
+
+const event = await getEntry("events", Astro.params.slug!);
+if (!event) throw new Error("Missing event");
+const site = await getSite();
+const { Content } = await render(event);
+const performer = event.data.performer ? site.artistsById.get(event.data.performer) : undefined;
+---
+
+<Layout title={`${event.data.title} | Sharp Records`} description={event.data.schemaDescription || event.data.home || event.data.title} ogType="website" jsonLd={{ "@context": "https://schema.org", "@graph": [organization({ email: site.settings.data.email, city: site.settings.data.city, country: site.settings.data.country, countryCode: site.settings.data.countryCode, genres: site.genres, description: site.homepage.data.seoDescription }), eventSchema(event, performer)] }}>
+  <header class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">{formatDate(event.data.start)} · {event.data.city}</p>
+      <h1>{event.data.title}</h1>
+    </div>
+  </header>
+  <section class="section">
+    <div class="wrap">
+      <article class="event" id={event.id}>
+        <p class="event__date">{formatDate(event.data.start)}</p>
+        <div>
+          <Content />
+          <p class="meta">
+            {event.data.city} · {event.data.venue}
+            {event.data.placeholder && <> · <span class="flag">Placeholder</span></>}
+          </p>
+          <Share path={`/events/${event.id}.html`} title={`${event.data.title} — Sharp Records`} />
+        </div>
+        <p class="event__note">{event.data.ticketUrl ? <a href={event.data.ticketUrl}>Tickets</a> : "Details forthcoming"}</p>
+      </article>
+    </div>
+  </section>
+</Layout>

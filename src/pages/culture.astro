@@ -1,0 +1,34 @@
+---
+import Layout from "../components/Layout.astro";
+import CultureArticle from "../components/CultureArticle.astro";
+import { getSite } from "../lib/content";
+import { organization, articleSchema } from "../lib/schema";
+import { shareImage } from "../lib/images";
+
+const site = await getSite();
+const page = site.sections.culture;
+const articles = await Promise.all(site.culture.map(async (article) => articleSchema({
+  id: article.id,
+  title: article.data.title,
+  description: article.data.excerpt,
+  date: article.data.date,
+  image: article.data.image ? await shareImage(article.data.image) : undefined,
+})));
+---
+
+<Layout title={`${page.data.title} | Sharp Records`} description={page.data.description} jsonLd={{ "@context": "https://schema.org", "@graph": [organization({ email: site.settings.data.email, city: site.settings.data.city, country: site.settings.data.country, countryCode: site.settings.data.countryCode, genres: site.genres, description: site.homepage.data.seoDescription }), ...articles] }}>
+  <header class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">{page.data.eyebrow}</p>
+      <h1>{page.data.title}</h1>
+      <p class="lede">{page.data.lede}</p>
+    </div>
+  </header>
+  <section class="section">
+    <div class="wrap editorial">
+      {site.culture.length > 0 ? site.culture.map((article) => (
+        <CultureArticle article={article} variant="page" />
+      )) : <p class="lede">No pieces published.</p>}
+    </div>
+  </section>
+</Layout>

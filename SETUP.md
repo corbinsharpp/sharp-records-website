@@ -1,43 +1,59 @@
-# Sharp Records website — setup
+# Sharp Records website
 
-Static HTML, CSS and a small progressive-enhancement script. No build step.
+The public site is a static build. Words, pictures, releases, artists, events, radio and culture are files in `src/content`, edited in the dashboard at `/admin` (Decap CMS). Astro turns those files into HTML.
 
-Pages: Home, Releases, Artists, Events, Radio, Culture, About and Enquire. The old `news.html` address redirects to Culture.
+British spelling. The contact page is Enquire.
 
-Pages: home, Releases, Artists, Events, Radio, Culture, About and Enquire. `news.html` redirects to Culture.
-
-## Local preview
-
-From this folder:
+## Preview
 
 ```bash
-python3 -m http.server 4173 --bind 127.0.0.1
+npm install
+npm run build
+npm run serve
 ```
 
-Then open http://127.0.0.1:4173/
+Open http://127.0.0.1:4173/
 
-## Contact form (Formspree)
+For a live reload while developing:
 
-Edit **one** place: `enquire.html`.
+```bash
+npm run dev
+```
 
-1. Sign up to [Formspree](https://formspree.io/) with corbinsharpp@gmail.com and copy the form ID.
-2. In the HTML comment labelled `CONTACT CONFIG`, replace `FORM_ID` in the form `action`:
+Open http://127.0.0.1:4321/
 
-   `action="https://formspree.io/f/FORM_ID"`
+## Dashboard on your own computer
 
-The mailto fallback is already set to `corbinsharpp@gmail.com` in the form’s `data-mailto` attribute and in the visible `mailto:` link. JavaScript keeps that link in sync from `data-mailto`.
+Chrome or Edge:
 
-The script posts with `Accept: application/json`, sets `_replyto` from the visitor’s email, and sets `_subject` to `New Sharp Records enquiry: {enquiry type}`. A hidden `_gotcha` field is the honeypot.
+```bash
+npm run cms
+npm run dev
+```
 
-Until a real Formspree ID is in place, submissions from the live file will fail and the on-page error (plus the mailto fallback) will show.
+Then open http://127.0.0.1:4321/admin
+
+`npm run cms` is the local bridge. It is only for your computer. The live site does not run it.
 
 ## Tests
 
 ```bash
-npm install
-npx playwright install chromium
 npm test
 ```
 
-Playwright serves the folder itself, intercepts Formspree, and never hits the real endpoint.
+## Where things live
 
+- `src/content` — everything Corby can edit
+- `src/pages` — page templates
+- `public/assets` — fonts, logo, audio, CSS, the small script
+- `src/assets/uploads` — pictures uploaded in the dashboard
+- `public/admin` — the dashboard
+- `functions/api` — enquiry form, newsletter, and GitHub sign-in (Cloudflare Pages)
+
+## Hosting and cost
+
+Cloudflare Pages. Build command `npm run build`, output directory `dist`. The `functions` folder is deployed with the site. Custom domain steps, analytics, Turnstile, Formspree and Buttondown are in `CMS-GUIDE.md`.
+
+Every service is on a free tier. The domain name is the only expected cost. The allowance for each service, and the point at which a paid plan would start, is the table at the top of `CMS-GUIDE.md`.
+
+Environment variables are listed in `.env.example`. None of them are required for the pages to build.

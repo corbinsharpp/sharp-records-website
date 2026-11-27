@@ -155,7 +155,7 @@ test("no 404s for same-origin links and assets", async ({ page, request, baseURL
 });
 
 test("site files include the new pages and British Enquire spelling", async () => {
-  const root = path.join(__dirname, "..");
+  const root = path.join(__dirname, "..", "dist");
   expect(fs.existsSync(path.join(root, "about.html"))).toBeTruthy();
   expect(fs.existsSync(path.join(root, "radio.html"))).toBeTruthy();
   expect(fs.existsSync(path.join(root, "culture.html"))).toBeTruthy();
@@ -172,7 +172,7 @@ test("news.html redirects to culture", async ({ page }) => {
 test.describe("enquire form", () => {
   test("empty submit shows validation errors and does not post", async ({ page }) => {
     const posts = [];
-    await page.route("https://formspree.io/**", (route) => {
+    await page.route("**/api/enquire", (route) => {
       posts.push(route.request().url());
       return route.abort();
     });
@@ -189,7 +189,7 @@ test.describe("enquire form", () => {
   });
 
   test("invalid email and demo URL are flagged", async ({ page }) => {
-    await page.route("https://formspree.io/**", (route) => route.abort());
+    await page.route("**/api/enquire", (route) => route.abort());
     await page.goto("/enquire.html");
     await fillValid(page, { email: "not-an-email", demo: "notaurl" });
     await page.getByRole("button", { name: "Send message" }).click();
@@ -202,7 +202,7 @@ test.describe("enquire form", () => {
   test("mocked Formspree success hides the fields", async ({ page }) => {
     const errors = attachConsole(page);
     let posted = null;
-    await page.route("https://formspree.io/f/**", async (route) => {
+    await page.route("**/api/enquire", async (route) => {
       posted = {
         method: route.request().method(),
         headers: route.request().headers(),
@@ -227,7 +227,7 @@ test.describe("enquire form", () => {
 
   test("mocked Formspree error shows the fallback message", async ({ page }) => {
     const errors = attachConsole(page);
-    await page.route("https://formspree.io/f/**", async (route) => {
+    await page.route("**/api/enquire", async (route) => {
       await route.fulfill({
         status: 400,
         contentType: "application/json",
@@ -321,7 +321,7 @@ test.describe("SR001 track previews", () => {
 
   test("no Untitled placeholders remain on pages or in JSON-LD", async ({ page }) => {
     const files = ["index.html", "releases.html", "artists.html", "culture.html", "enquire.html"];
-    const root = path.join(__dirname, "..");
+    const root = path.join(__dirname, "..", "dist");
     for (const file of files) {
       const text = fs.readFileSync(path.join(root, file), "utf8");
       expect(text.includes("Untitled"), `${file} should not contain Untitled`).toBeFalsy();

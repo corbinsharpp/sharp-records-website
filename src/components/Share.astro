@@ -1,0 +1,21 @@
+---
+import { absolute } from "../lib/site";
+
+interface Props {
+  path: string;
+  title: string;
+}
+
+const { path, title } = Astro.props;
+const url = absolute(path);
+const encoded = encodeURIComponent(url);
+const text = encodeURIComponent(title);
+---
+
+<div class="share">
+  <span class="share__label">Share</span>
+  <a href={`https://twitter.com/intent/tweet?url=${encoded}&text=${text}`} target="_blank" rel="noopener noreferrer">X<span class="visually-hidden"> (opens in a new tab)</span></a>
+  <a href={`https://www.facebook.com/sharer/sharer.php?u=${encoded}`} target="_blank" rel="noopener noreferrer">Facebook<span class="visually-hidden"> (opens in a new tab)</span></a>
+  <a href={`mailto:?subject=${text}&body=${encoded}`}>Email</a>
+  <button type="button" data-copy-link={url}>Copy link</button>
+</div>

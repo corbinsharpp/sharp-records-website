@@ -1,0 +1,37 @@
+---
+import { Picture } from "astro:assets";
+import { findImage } from "../lib/images";
+
+interface Props {
+  src?: string | null;
+  alt: string;
+  sizes: string;
+  loading?: "lazy" | "eager";
+  class?: string;
+  fetchpriority?: "high" | "low" | "auto";
+  required?: boolean;
+}
+
+const { src, alt, sizes, loading = "lazy", class: className, fetchpriority, required = true } = Astro.props;
+const image = findImage(src);
+if (required && !image) {
+  throw new Error(`Missing image file${src ? ` (${src})` : ""}. Upload it again in the dashboard.`);
+}
+const widths = image ? [480, 800, 1200, 1600].filter((width) => width < image.width) : [];
+if (image && !widths.includes(image.width)) widths.push(image.width);
+---
+
+{image && (
+<Picture
+  src={image}
+  alt={alt}
+  widths={widths}
+  sizes={sizes}
+  formats={["avif", "webp"]}
+  fallbackFormat="jpg"
+  loading={loading}
+  decoding="async"
+  fetchpriority={fetchpriority}
+  class={className}
+/>
+)}
